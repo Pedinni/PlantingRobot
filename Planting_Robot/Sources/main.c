@@ -43,6 +43,7 @@
 #include "PE_Const.h"
 #include "IO_Map.h"
 /* User includes (#include below this line is not maintained by Processor Expert) */
+#define Erkenndistanz	5000		//ca. 40cm
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
@@ -60,7 +61,7 @@ int main(void)
 	  (void)AD1_Measure(TRUE);
 	  (void)AD1_GetValue16(&IR_Value);
 
-	  if (IR_Value >= 32000){
+	  if (IR_Value >= Erkenndistanz){
 		  LED1_On();
 	  } else{
 		  LED1_Off();
