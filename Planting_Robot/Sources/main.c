@@ -37,37 +37,32 @@
 #include "WAIT1.h"
 #include "AD1.h"
 #include "AdcLdd1.h"
+#include "FRTOS1.h"
+#include "UTIL1.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
 #include "IO_Map.h"
 /* User includes (#include below this line is not maintained by Processor Expert) */
-#define Erkenndistanz	5000		//ca. 40cm
+#include "Application.h"
+
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
 {
   /* Write your local variable definition here */
-	uint16_t IR_Value = 0;
+
   /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
   PE_low_level_init();
   /*** End of Processor Expert internal initialization.                    ***/
 
   /* Write your code here */
   /* For example: for(;;) { } */
-  for(;;){
-	  (void)AD1_Measure(TRUE);
-	  (void)AD1_GetValue16(&IR_Value);
 
-	  if (IR_Value >= Erkenndistanz){
-		  LED1_On();
-	  } else{
-		  LED1_Off();
-	  }
-	  WAIT1_Waitms(100);
-  }
+  App_Init();			// Creates Tasks
+
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
   /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/
   #ifdef PEX_RTOS_START
