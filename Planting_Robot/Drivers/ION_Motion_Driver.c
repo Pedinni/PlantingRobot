@@ -11,32 +11,43 @@
 
 static void ION_Motion_Task(void *pvParameters) {
   (void)pvParameters; /* parameter not used */
-  bool sent = 0;
+
   for(;;) {
-	  if(sent != 1){
-		  sent = 1;
-		  CLS1_SendNum8u(128, CLS1_GetStdio()->stdOut);				// Adress:	(128)
-		  CLS1_SendNum8u(6, CLS1_GetStdio()->stdOut);				// Command: Drive M1 (6)
-		  CLS1_SendNum8u(80, CLS1_GetStdio()->stdOut);				// Value:	Drive motor 1 forward or reverse. Valid data range is 0 - 127.
-		  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	// 			A value of 0 = full speed reverse, 64 = stop and 127 = full speed forward
-		  unsigned int packet[3];
-		  packet[0] = 128;
-		  packet[1] = 6;
-		  packet[2] = 80;
+	  /*unsigned char* String[5];
 
-		  //packet = (unsigned char*)packet;
+	  strcat(&String, 128);
+	  strcat(&String, 6);
+	  strcat(&String, 80);
 
-		  /*
-		  strcpy(packet,"128");
-		  strcpy(packet,"6");
+	  CLS1_SendStr(&String, CLS1_GetStdio()->stdOut);
+	  */
+
+	  unsigned int packet[3];
+	  packet[0] = 0x00;		//128
+	  packet[1] = 0xFF;		//6
+	  packet[2] = 0x00;		//80
+
+	  CLS1_SendNum8u(packet[1], CLS1_GetStdio()->stdOut);				// Adress:	(128)
+	  //FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+	  //CLS1_SendNum8u(packet[1], CLS1_GetStdio()->stdOut);				// Command: Drive M1 (6)
+	  //FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+	  //CLS1_SendNum8u(packet[2], CLS1_GetStdio()->stdOut);				// Value:	Drive motor 1 forward or reverse. Valid data range is 0 - 127.
+	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  			// 			A value of 0 = full speed reverse, 64 = stop and 127 = full speed forward
+
+
+	  //packet = (unsigned char*)packet;
+
+	  /*
+ 	 	 strcpy(packet,"128");
+	 	 strcpy(packet,"6");
 		  strcpy(packet,"80");
-		   */
-		  //unsigned int crc = crc16(packet, sizeof(packet));
+	  */
+	  //unsigned int crc = crc16(packet, sizeof(packet));
 
-		  //CLS1_SendNum16u(crc, CLS1_GetStdio()->stdOut);		// CRC 2 Byte
+	  //CLS1_SendNum16u(crc, CLS1_GetStdio()->stdOut);		// CRC 2 Byte
 
-	  }
-  }
+	  FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+  	  }
 }
 
 //Calculates CRC16 of nBytes of data in byte array message

@@ -10,11 +10,44 @@
 #include "IR_Sensor_Driver.c"
 #include "ION_Motion_Driver.c"
 
-/*
- * Creating all RTOS Tasks here
- */
 
-void App_Init(void){
+/*
+ * Starting up the Application
+ */
+void APP_Start(){
+	APP_InitComponents();
+	APP_CreateTasks();
+	vTaskStartScheduler(); 			// start the RTOS, create the IDLE task and run my tasks (if any)
+	__asm volatile("cpsie i");		// Enable Interrupts
+}
+
+
+/*
+ * Initializing the defined Components
+ */
+void APP_InitComponents(void){
+	CLS1_Init();
+	SYS1_Init();
+	RTT1_Init();
+	UTIL1_Init();
+#if LED_TASK_IS_ACTIVE
+	LED1_Init();
+#endif
+#if IR_SENSOR_TASK_IS_ACTIVE
+	AdcLdd1_Init();
+#endif
+
+/*	Argument for ADC initialisation?
+#if	ION_MOTION_TASK_IS_ACTIVE
+	ASerialLdd1_Init();
+#endif
+*/
+}
+
+/*
+ * Creating the defined RTOS Tasks
+ */
+void APP_CreateTasks(void){
 #if LED_TASK_IS_ACTIVE
 	/* Initialisation of the LED_Driver Task*/
 	if (FRTOS1_xTaskCreate(
