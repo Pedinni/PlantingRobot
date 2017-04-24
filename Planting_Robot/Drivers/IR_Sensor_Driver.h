@@ -19,3 +19,5 @@
 #define Erkenndistanz	5000		//ca. 40cm
 
 static void IR_Sensor_Task(void *pvParameters);
+
+void IR_Sensor_Driver_Init();

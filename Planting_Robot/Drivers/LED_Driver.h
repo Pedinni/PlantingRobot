@@ -16,3 +16,5 @@
 #endif /* DRIVERS_LED_DRIVER_H_ */
 
 static void LED_Task(void *pvParameters);
+
+void LED_Driver_Init(void);

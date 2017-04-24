@@ -67,3 +67,18 @@ unsigned int crc16(unsigned char *packet, int nBytes) {
 	return crc;
 }
 */
+
+void ION_Motion_Driver_Init(void){
+	/* Initialisation of the IR_Sensor_Driver Task*/
+	if (FRTOS1_xTaskCreate(
+		ION_Motion_Task,  /* pointer to the task */
+	    (signed portCHAR *)"ION_Motion_Task", /* task name for kernel awareness debugging */
+	    configMINIMAL_STACK_SIZE, /* task stack size */
+	    (void*)NULL, /* optional task startup argument */
+	    tskIDLE_PRIORITY,  /* initial priority */
+	    (xTaskHandle*)NULL /* optional task handle to create */
+	) != pdPASS)
+	{
+		for(;;){}; /* Out of heap memory? */
+	}
+}

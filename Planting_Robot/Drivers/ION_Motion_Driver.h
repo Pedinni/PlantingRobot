@@ -17,3 +17,5 @@
 static void ION_Motion_Task(void *pvParameters);
 
 //unsigned int crc16(unsigned char *packet, int nBytes);
+
+void ION_Motion_Driver_Init(void);

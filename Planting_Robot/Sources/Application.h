@@ -10,6 +10,8 @@
 
 #include "FRTOS1.h"
 #include "UTIL1.h"
+#include "LED1.h"
+//#include "LED_Driver.h"
 
 #endif /* SOURCES_APPLICATION_H_ */
 
@@ -19,4 +21,4 @@
 
 void APP_Start(void);
 void APP_InitComponents(void);
-void APP_CreateTasks(void);
+

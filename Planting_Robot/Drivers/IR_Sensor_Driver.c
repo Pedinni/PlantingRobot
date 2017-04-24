@@ -25,3 +25,18 @@ static void IR_Sensor_Task(void *pvParameters) {
 		WAIT1_Waitms(100);
 	}
 }
+
+void IR_Sensor_Driver_Init(void){
+	/* Initialisation of the IR_Sensor_Driver Task*/
+	if (FRTOS1_xTaskCreate(
+	    IR_Sensor_Task,  /* pointer to the task */
+	    (signed portCHAR *)"IR_Sensor_Task", /* task name for kernel awareness debugging */
+	    configMINIMAL_STACK_SIZE, /* task stack size */
+	    (void*)NULL, /* optional task startup argument */
+	    tskIDLE_PRIORITY,  /* initial priority */
+	    (xTaskHandle*)NULL /* optional task handle to create */
+	) != pdPASS)
+	{
+	   for(;;){}; /* Out of heap memory? */
+	}
+}

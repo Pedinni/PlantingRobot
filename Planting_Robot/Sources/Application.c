@@ -6,9 +6,9 @@
  */
 
 #include "Application.h"
-#include "LED_Driver.c"
-#include "IR_Sensor_Driver.c"
-#include "ION_Motion_Driver.c"
+#include "LED_Driver.h"
+#include "IR_Sensor_Driver.h"
+#include "ION_Motion_Driver.h"
 
 
 /*
@@ -16,7 +16,6 @@
  */
 void APP_Start(){
 	APP_InitComponents();
-	APP_CreateTasks();
 	vTaskStartScheduler(); 			// start the RTOS, create the IDLE task and run my tasks (if any)
 	__asm volatile("cpsie i");		// Enable Interrupts
 }
@@ -30,69 +29,16 @@ void APP_InitComponents(void){
 	SYS1_Init();
 	RTT1_Init();
 	UTIL1_Init();
+
 #if LED_TASK_IS_ACTIVE
 	LED1_Init();
+	LED_Driver_Init();
+#endif
+#if ION_MOTION_TASK_IS_ACTIVE
+	ION_Motion_Driver_Init();
 #endif
 #if IR_SENSOR_TASK_IS_ACTIVE
+	IR_Sensor_Driver_Init();
 	AdcLdd1_Init();
 #endif
-
-/*	Argument for ADC initialisation?
-#if	ION_MOTION_TASK_IS_ACTIVE
-	ASerialLdd1_Init();
-#endif
-*/
 }
-
-/*
- * Creating the defined RTOS Tasks
- */
-void APP_CreateTasks(void){
-#if LED_TASK_IS_ACTIVE
-	/* Initialisation of the LED_Driver Task*/
-	if (FRTOS1_xTaskCreate(
-	    LED_Task,  /* pointer to the task */
-	    (signed portCHAR *)"LED_Task", /* task name for kernel awareness debugging */
-	    configMINIMAL_STACK_SIZE, /* task stack size */
-	    (void*)NULL, /* optional task startup argument */
-	    tskIDLE_PRIORITY,  /* initial priority */
-	    (xTaskHandle*)NULL /* optional task handle to create */
-	   ) != pdPASS)
-	{
-	   for(;;){}; /* Out of heap memory? */
-	}
-#endif
-
-#if IR_SENSOR_TASK_IS_ACTIVE
-	/* Initialisation of the IR_Sensor_Driver Task*/
-		if (FRTOS1_xTaskCreate(
-		    IR_Sensor_Task,  /* pointer to the task */
-		    (signed portCHAR *)"IR_Sensor_Task", /* task name for kernel awareness debugging */
-		    configMINIMAL_STACK_SIZE, /* task stack size */
-		    (void*)NULL, /* optional task startup argument */
-		    tskIDLE_PRIORITY,  /* initial priority */
-		    (xTaskHandle*)NULL /* optional task handle to create */
-		   ) != pdPASS)
-		{
-		   for(;;){}; /* Out of heap memory? */
-		}
-#endif
-
-#if ION_MOTION_TASK_IS_ACTIVE
-	/* Initialisation of the IR_Sensor_Driver Task*/
-		if (FRTOS1_xTaskCreate(
-				ION_Motion_Task,  /* pointer to the task */
-		    (signed portCHAR *)"ION_Motion_Task", /* task name for kernel awareness debugging */
-		    configMINIMAL_STACK_SIZE, /* task stack size */
-		    (void*)NULL, /* optional task startup argument */
-		    tskIDLE_PRIORITY,  /* initial priority */
-		    (xTaskHandle*)NULL /* optional task handle to create */
-		   ) != pdPASS)
-		{
-		   for(;;){}; /* Out of heap memory? */
-		}
-#endif
-
-
-}
-
