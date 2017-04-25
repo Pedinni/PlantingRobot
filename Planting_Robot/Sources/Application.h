@@ -15,9 +15,10 @@
 
 #endif /* SOURCES_APPLICATION_H_ */
 
-#define IR_SENSOR_TASK_IS_ACTIVE 	(0)
-#define LED_TASK_IS_ACTIVE 			(1)
-#define ION_MOTION_TASK_IS_ACTIVE 	(1)
+#define IR_SENSOR_IS_ACTIVE 		(0)
+#define LED_IS_ACTIVE 				(0)
+#define ION_MOTION_IS_ACTIVE 		(0)
+#define SHELL_IS_ACTIVE				(1)
 
 void APP_Start(void);
 void APP_InitComponents(void);
