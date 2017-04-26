@@ -10,6 +10,7 @@
 #include "IR_Sensor_Driver.h"
 #include "ION_Motion_Driver.h"
 #include "Shell_Driver.h"
+#include "Hall_Sensor_Driver.h"
 
 
 /*
@@ -30,9 +31,9 @@ void APP_InitComponents(void){
 	SYS1_Init();
 	RTT1_Init();
 	UTIL1_Init();
+	LED1_Init();
 
 #if LED_IS_ACTIVE
-	LED1_Init();
 	LED_Driver_Init();
 #endif
 #if ION_MOTION_IS_ACTIVE
@@ -44,5 +45,8 @@ void APP_InitComponents(void){
 #endif
 #if SHELL_IS_ACTIVE
 	Shell_Driver_Init();
+#endif
+#if HALL_SENSOR_IS_ACTIVE
+	Hall_Sensor_Driver_Init();
 #endif
 }

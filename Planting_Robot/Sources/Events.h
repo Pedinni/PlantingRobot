@@ -52,6 +52,8 @@
 #include "AS2.h"
 #include "ASerialLdd2.h"
 #include "CLS2.h"
+#include "Hall_Sensor.h"
+#include "BitIoLdd2.h"
 
 #ifdef __cplusplus
 extern "C" {
