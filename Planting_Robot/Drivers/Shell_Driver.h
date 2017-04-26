@@ -16,10 +16,11 @@
 #include "CLS2.h"
 #include "LED_Driver.h"
 
-#endif /* DRIVERS_LED_DRIVER_H_ */
 
 static void Shell_Task(void *pvParameters);
 
 void Shell_Driver_Init(void);
 
 void DoUART(void);
+
+#endif /* DRIVERS_LED_DRIVER_H_ */

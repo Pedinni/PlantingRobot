@@ -16,10 +16,10 @@
 #include "CLS2.h"
 
 
-#endif /* DRIVERS_LED_DRIVER_H_ */
-
 static void LED_Task(void *pvParameters);
 
 uint8_t LEDParseCommand(const unsigned char *cmd, bool *handled, const CLS2_StdIOType *io);
 
 void LED_Driver_Init(void);
+
+#endif /* DRIVERS_LED_DRIVER_H_ */

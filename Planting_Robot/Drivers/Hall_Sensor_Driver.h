@@ -16,11 +16,10 @@
 #include "CLS2.h"
 #include "Hall_Sensor.h"
 
-
-#endif /* DRIVERS_Hall_Sensor_Driver_H_ */
-
 static void Hall_Sensor_Task(void *pvParameters);
 
 uint8_t Hall_SensorParseCommand(const unsigned char *cmd, bool *handled, const CLS2_StdIOType *io);
 
 void Hall_Sensor_Driver_Init(void);
+
+#endif /* DRIVERS_Hall_Sensor_Driver_H_ */

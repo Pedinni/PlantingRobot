@@ -21,13 +21,13 @@ static void ION_Motion_Task(void *pvParameters) {
 
 	  CLS1_SendStr(&String, CLS1_GetStdio()->stdOut);
 	  */
-
+/*
 	  unsigned int packet[3];
 	  packet[0] = 0x00;		//128
 	  packet[1] = 0xFF;		//6
 	  packet[2] = 0x00;		//80
-
-	  CLS1_SendNum8u(packet[1], CLS1_GetStdio()->stdOut);				// Adress:	(128)
+*/
+	  //CLS1_SendNum8u(packet[1], CLS1_GetStdio()->stdOut);				// Adress:	(128)
 	  //FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
 	  //CLS1_SendNum8u(packet[1], CLS1_GetStdio()->stdOut);				// Command: Drive M1 (6)
 	  //FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
@@ -46,7 +46,8 @@ static void ION_Motion_Task(void *pvParameters) {
 
 	  //CLS1_SendNum16u(crc, CLS1_GetStdio()->stdOut);		// CRC 2 Byte
 
-	  FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+	  ION_SimpleSerialTest();
+	  //FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
   	  }
 }
 
@@ -67,6 +68,38 @@ unsigned int crc16(unsigned char *packet, int nBytes) {
 	return crc;
 }
 */
+
+/*
+ * Nur zu Debugg Zwecken verwenden. Zu unsicher für den Feldbetrieb!!
+ *
+ * Diese Methode funktioniert nur wenn der Motor Controller auf Simple Serial konfiguriert ist.
+ * In diesem Betriebsmodus kann lediglich ein 1 Byte langer Befehl gesendet werden, welcher
+ * das Motoren PWM steuert. Auch wird keine Checksumme berechnet und der TX Pin des Motor
+ * Controllers wird nicht angeschlossen.
+ */
+void ION_SimpleSerialTest(void){
+	char packet[3];
+	packet[0] = 64;				// full forward
+	packet[1] = 1;				// full reverse
+	packet[2] = 127;			// full forward
+
+	CLS1_SendChar(packet[0]);
+	LED1_Off();
+	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+	CLS1_SendChar(packet[1]);
+	LED1_On();
+	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+	CLS1_SendChar(packet[0]);
+	LED1_Off();
+	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+	CLS1_SendChar(packet[2]);
+	LED1_Off();
+	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+}
+
 
 void ION_Motion_Driver_Init(void){
 	/* Initialisation of the IR_Sensor_Driver Task*/
