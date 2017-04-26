@@ -17,8 +17,11 @@
 
 static void ION_Motion_Task(void *pvParameters);
 
-//unsigned int crc16(unsigned char *packet, int nBytes);
 void ION_SimpleSerialTest(void);
+
+void ION_PacketSerialTest(void);
+
+unsigned short crc16(unsigned char *packet, int nBytes);
 
 void ION_Motion_Driver_Init(void);
 

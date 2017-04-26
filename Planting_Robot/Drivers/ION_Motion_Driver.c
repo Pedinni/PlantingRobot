@@ -8,66 +8,17 @@
 
 #include "ION_Motion_Driver.h"
 
+#define address	0x80
 
 static void ION_Motion_Task(void *pvParameters) {
   (void)pvParameters; /* parameter not used */
 
   for(;;) {
-	  /*unsigned char* String[5];
-
-	  strcat(&String, 128);
-	  strcat(&String, 6);
-	  strcat(&String, 80);
-
-	  CLS1_SendStr(&String, CLS1_GetStdio()->stdOut);
-	  */
-/*
-	  unsigned int packet[3];
-	  packet[0] = 0x00;		//128
-	  packet[1] = 0xFF;		//6
-	  packet[2] = 0x00;		//80
-*/
-	  //CLS1_SendNum8u(packet[1], CLS1_GetStdio()->stdOut);				// Adress:	(128)
-	  //FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
-	  //CLS1_SendNum8u(packet[1], CLS1_GetStdio()->stdOut);				// Command: Drive M1 (6)
-	  //FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
-	  //CLS1_SendNum8u(packet[2], CLS1_GetStdio()->stdOut);				// Value:	Drive motor 1 forward or reverse. Valid data range is 0 - 127.
-	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  			// 			A value of 0 = full speed reverse, 64 = stop and 127 = full speed forward
-
-
-	  //packet = (unsigned char*)packet;
-
-	  /*
- 	 	 strcpy(packet,"128");
-	 	 strcpy(packet,"6");
-		  strcpy(packet,"80");
-	  */
-	  //unsigned int crc = crc16(packet, sizeof(packet));
-
-	  //CLS1_SendNum16u(crc, CLS1_GetStdio()->stdOut);		// CRC 2 Byte
-
-	  ION_SimpleSerialTest();
+	  //ION_SimpleSerialTest();
+	  ION_PacketSerialTest();
 	  //FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
   	  }
 }
-
-//Calculates CRC16 of nBytes of data in byte array message
-/*
-unsigned int crc16(unsigned char *packet, int nBytes) {
-	unsigned int crc;
-	for (int byte = 0; byte < nBytes; byte++) {
-		crc = crc ^ ((unsigned int)packet[byte] << 8);
-		for (unsigned char bit = 0; bit < 8; bit++) {
-			if (crc & 0x8000) {
-				crc = (crc << 1) ^ 0x1021;
-			} else {
-				crc = crc << 1;
-			}
-		}
-	}
-	return crc;
-}
-*/
 
 /*
  * Nur zu Debugg Zwecken verwenden. Zu unsicher für den Feldbetrieb!!
@@ -76,10 +27,14 @@ unsigned int crc16(unsigned char *packet, int nBytes) {
  * In diesem Betriebsmodus kann lediglich ein 1 Byte langer Befehl gesendet werden, welcher
  * das Motoren PWM steuert. Auch wird keine Checksumme berechnet und der TX Pin des Motor
  * Controllers wird nicht angeschlossen.
+ *
+ * In this mode S1 accepts TTL level byte commands. Standard serial mode is one way serial data.
+ * RoboClaw can receive only. A standard 8N1 format is used. Which is 8 bits, no parity bits and
+ * 1 stop bit.
  */
 void ION_SimpleSerialTest(void){
-	char packet[3];
-	packet[0] = 64;				// full forward
+	unsigned char packet[3];
+	packet[0] = 64;				// stop
 	packet[1] = 1;				// full reverse
 	packet[2] = 127;			// full forward
 
@@ -96,8 +51,68 @@ void ION_SimpleSerialTest(void){
 	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
 	CLS1_SendChar(packet[2]);
+	LED1_On();
+	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+}
+
+
+/*
+ * Packet serial is a buffered bidirectional serial mode. More sophisticated instructions can be sent
+ * to RoboClaw. The basic command structures consist of an address byte, command byte, data
+ * bytes and a CRC16 16bit checksum. The amount of data each command will send or receive can
+ * vary.
+ */
+void ION_PacketSerialTest(void){
+	unsigned char packet[5];
+	unsigned short crc = 0;
+	packet[0] = address;					// Address Byte
+	packet[1] = 0;							// Command Byte:	Drive Forward Motor 1
+	packet[2] = 127;						// Value Byte 1:	Fullspeed (127)
+	crc = crc16(packet,3);
+	packet[3] = (char)(crc>>8);			// CRC1
+	packet[4] = (char)crc;				// CRC2
+
+	CLS1_SendChar(packet[0]);
+	CLS1_SendChar(packet[1]);
+	CLS1_SendChar(packet[2]);
+	CLS1_SendChar(packet[3]);
+	CLS1_SendChar(packet[4]);
+	LED1_On();
+	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+	packet[0] = address;					// Address Byte
+	packet[1] = 0;							// Command Byte:	Drive Forward Motor 1
+	packet[2] = 0;							// Value Byte 1:	Fullspeed (127)
+	crc = crc16(packet,3);
+	packet[3] = (char)(crc>>8);			// CRC1
+	packet[4] = (char)crc;				// CRC2
+
+	CLS1_SendChar(packet[0]);
+	CLS1_SendChar(packet[1]);
+	CLS1_SendChar(packet[2]);
+	CLS1_SendChar(packet[3]);
+	CLS1_SendChar(packet[4]);
 	LED1_Off();
 	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+}
+
+
+/*
+ * Calculates CRC16 of nBytes of data in byte array message
+ */
+unsigned short crc16(unsigned char *packet, int nBytes) {
+	unsigned short crc;
+	for (int byte = 0; byte < nBytes; byte++) {
+		crc = crc ^ ((unsigned short)packet[byte] << 8);
+		for (unsigned char bit = 0; bit < 8; bit++) {
+			if (crc & 0x8000) {
+				crc = (crc << 1) ^ 0x1021;
+			} else {
+				crc = crc << 1;
+			}
+		}
+	}
+	return crc;
 }
 
 
