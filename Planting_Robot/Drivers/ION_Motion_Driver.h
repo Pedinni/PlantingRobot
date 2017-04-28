@@ -20,6 +20,14 @@ typedef enum Command_{
 	drive_setzeinheit_backward 		= 5
 }command_t;
 
+typedef enum Position_{
+	Topf_9,
+	Topf_11,
+	Topf_12,
+	Topf_13,
+	Topf_14,
+}position_t;
+
 static void ION_Motion_Task(void *pvParameters);
 
 void ION_SimpleSerialTest(void);

@@ -11,16 +11,26 @@
 #define address	0x80
 
 static void ION_Motion_Task(void *pvParameters) {
-  (void)pvParameters; /* parameter not used */
+	(void)pvParameters; /* parameter not used */
 
-  for(;;) {
-	  //ION_SimpleSerialTest();
-	  //ION_PacketSerialTest();
-	  setPosition(FALSE);
-	  FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-	  setPosition(TRUE);
-	  FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-  	  }
+	for(;;) {
+		//ION_SimpleSerialTest();
+		//ION_PacketSerialTest();
+		setPosition(Topf_9);
+		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+		setPosition(Topf_11);
+		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+		setPosition(Topf_12);
+		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+		setPosition(Topf_13);
+		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+		setPosition(Topf_14);
+		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+	}
 }
 
 /*
@@ -73,7 +83,7 @@ void ION_PacketSerialTest(void){
 	}
 }
 
-void setPosition(bool pos){
+void setPosition(position_t pos){
 	int packetSize = 21;
 	unsigned char packet[packetSize];
 	unsigned short crc = 0;
@@ -97,14 +107,35 @@ void setPosition(bool pos){
 	packet[12] = 0;
 	packet[13] = 0;
 
-	if(pos == FALSE){
+	if(pos == Topf_9){
 		packet[14] = 0;			// Position (4 Bytes)
 		packet[15] = 0;
 		packet[16] = 0;
 		packet[17] = 0;
 	}
 
-	if(pos == TRUE){
+	if(pos == Topf_11){
+		packet[14] = 0;			// Position (4 Bytes)
+		packet[15] = 0;
+		packet[16] = 0x03;
+		packet[17] = 0xE8;
+	}
+
+	if(pos == Topf_12){
+		packet[14] = 0;			// Position (4 Bytes)
+		packet[15] = 0;
+		packet[16] = 0x07;
+		packet[17] = 0xD0;
+	}
+
+	if(pos == Topf_13){
+		packet[14] = 0;			// Position (4 Bytes)
+		packet[15] = 0;
+		packet[16] = 0x0B;
+		packet[17] = 0xB8;
+	}
+
+	if(pos == Topf_14){
 		packet[14] = 0;			// Position (4 Bytes)
 		packet[15] = 0;
 		packet[16] = 0x0F;
