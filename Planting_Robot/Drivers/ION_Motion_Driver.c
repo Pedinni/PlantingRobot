@@ -15,8 +15,11 @@ static void ION_Motion_Task(void *pvParameters) {
 
   for(;;) {
 	  //ION_SimpleSerialTest();
-	  ION_PacketSerialTest();
-	  //FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+	  //ION_PacketSerialTest();
+	  setPosition(FALSE);
+	  FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+	  setPosition(TRUE);
+	  FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
   	  }
 }
 
@@ -45,14 +48,6 @@ void ION_SimpleSerialTest(void){
 	CLS1_SendChar(packet[1]);
 	LED1_On();
 	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-
-	CLS1_SendChar(packet[0]);
-	LED1_Off();
-	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-
-	CLS1_SendChar(packet[2]);
-	LED1_On();
-	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 }
 
 
@@ -73,9 +68,55 @@ void ION_PacketSerialTest(void){
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 	}
 	for(int i = 0; i < 100; i++){
-			setMotorSpeed(drive_vereinzelung_forward,100-i);
-			FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
-		}
+		setMotorSpeed(drive_vereinzelung_forward,100-i);
+		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+	}
+}
+
+void setPosition(bool pos){
+	int packetSize = 21;
+	unsigned char packet[packetSize];
+	unsigned short crc = 0;
+
+	packet[0] = address;
+
+	packet[1] = 65;			// command
+
+	packet[2] = 0;			// Accel (4 Bytes)
+	packet[3] = 0;
+	packet[4] = 0;
+	packet[5] = 0;
+
+	packet[6] = 0;			// Speed (4 Bytes)
+	packet[7] = 0;
+	packet[8] = 0;
+	packet[9] = 0;
+
+	packet[10] = 0;			// Deccel (4 Bytes)
+	packet[11] = 0;
+	packet[12] = 0;
+	packet[13] = 0;
+
+	if(pos == FALSE){
+		packet[14] = 0;			// Position (4 Bytes)
+		packet[15] = 0;
+		packet[16] = 0;
+		packet[17] = 0;
+	}
+
+	if(pos == TRUE){
+		packet[14] = 0;			// Position (4 Bytes)
+		packet[15] = 0;
+		packet[16] = 0x0F;
+		packet[17] = 0xA0;
+	}
+
+	packet[18] = 1;
+
+	crc = crc16(packet,19);
+	packet[19] = (char)(crc>>8);				// CRC1
+	packet[20] = (char)crc;						// CRC2
+	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
 }
 
 /*
@@ -110,11 +151,9 @@ void setMotorSpeed(command_t command, int speed){
  * Sends a char packet to the Driver
  */
 void ION_Motion_sendPacket(unsigned char packet[], int packetlength){
-	//int packetlength = (&packet)[1]-packet;
-
-	for(int i=0; i<packetlength; i++){
-		CLS1_SendChar(packet[i]);
-	}
+		for(int i=0; i<packetlength; i++){
+			CLS1_SendChar(packet[i]);
+		}
 }
 
 /*
