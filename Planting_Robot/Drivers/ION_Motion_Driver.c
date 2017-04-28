@@ -63,30 +63,47 @@ void ION_SimpleSerialTest(void){
  * vary.
  */
 void ION_PacketSerialTest(void){
+	setMotorSpeed(drive_vereinzelung_forward,0);
+	LED1_Off();
+	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+	LED1_On();
+	for(int i = 0; i < 100; i++){
+		setMotorSpeed(drive_vereinzelung_forward,i);
+		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+	}
+	for(int i = 0; i < 100; i++){
+			setMotorSpeed(drive_vereinzelung_forward,100-i);
+			FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		}
+}
+
+/*
+ * param command:	defines the command, modi
+ * param speed:		0... 127 	0=stop / 127=fullspeed
+ */
+void setMotorSpeed(command_t command, int speed){
 	int packetSize = 5;
 	unsigned char packet[packetSize];
 	unsigned short crc = 0;
-	packet[0] = address;					// Address Byte
-	packet[1] = 0;							// Command Byte:	Drive Forward Motor 1
-	packet[2] = 127;						// Value Byte 1:	Fullspeed (127)
-	crc = crc16(packet,3);
-	packet[3] = (char)(crc>>8);			// CRC1
-	packet[4] = (char)crc;				// CRC2
 
-	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
-	LED1_On();
-	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+	packet[0] = address;
+	packet[1] = command;
 
-	packet[0] = address;					// Address Byte
-	packet[1] = 0;							// Command Byte:	Drive Forward Motor 1
-	packet[2] = 0;							// Value Byte 1:	Fullspeed (127)
+	if(speed > 127){
+		packet[2] = 127;
+	}
+	else if(speed < 0){
+		packet[2] = 0;
+	} else{
+		packet[2] = speed;
+	}
+
 	crc = crc16(packet,3);
 	packet[3] = (char)(crc>>8);				// CRC1
 	packet[4] = (char)crc;					// CRC2
 
 	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
-	LED1_Off();
-	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 }
 
 /*
@@ -104,7 +121,7 @@ void ION_Motion_sendPacket(unsigned char packet[], int packetlength){
  * Calculates CRC16 of nBytes of data in byte array message
  */
 unsigned short crc16(unsigned char *packet, int nBytes) {
-	unsigned short crc;
+	unsigned short crc = 0;
 	for (int byte = 0; byte < nBytes; byte++) {
 		crc = crc ^ ((unsigned short)packet[byte] << 8);
 		for (unsigned char bit = 0; bit < 8; bit++) {
@@ -117,7 +134,6 @@ unsigned short crc16(unsigned char *packet, int nBytes) {
 	}
 	return crc;
 }
-
 
 void ION_Motion_Driver_Init(void){
 	/* Initialisation of the IR_Sensor_Driver Task*/

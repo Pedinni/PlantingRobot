@@ -13,7 +13,12 @@
 #include "CLS1.h"
 #include "LED1.h"
 
-
+typedef enum Command_{
+	drive_vereinzelung_forward 		= 0,
+	drive_vereinzelung_backward 	= 1,
+	drive_setzeinheit_forward 		= 4,
+	drive_setzeinheit_backward 		= 5
+}command_t;
 
 static void ION_Motion_Task(void *pvParameters);
 
