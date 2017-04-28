@@ -63,7 +63,8 @@ void ION_SimpleSerialTest(void){
  * vary.
  */
 void ION_PacketSerialTest(void){
-	unsigned char packet[5];
+	int packetSize = 5;
+	unsigned char packet[packetSize];
 	unsigned short crc = 0;
 	packet[0] = address;					// Address Byte
 	packet[1] = 0;							// Command Byte:	Drive Forward Motor 1
@@ -72,11 +73,7 @@ void ION_PacketSerialTest(void){
 	packet[3] = (char)(crc>>8);			// CRC1
 	packet[4] = (char)crc;				// CRC2
 
-	CLS1_SendChar(packet[0]);
-	CLS1_SendChar(packet[1]);
-	CLS1_SendChar(packet[2]);
-	CLS1_SendChar(packet[3]);
-	CLS1_SendChar(packet[4]);
+	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
 	LED1_On();
 	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
@@ -84,18 +81,24 @@ void ION_PacketSerialTest(void){
 	packet[1] = 0;							// Command Byte:	Drive Forward Motor 1
 	packet[2] = 0;							// Value Byte 1:	Fullspeed (127)
 	crc = crc16(packet,3);
-	packet[3] = (char)(crc>>8);			// CRC1
-	packet[4] = (char)crc;				// CRC2
+	packet[3] = (char)(crc>>8);				// CRC1
+	packet[4] = (char)crc;					// CRC2
 
-	CLS1_SendChar(packet[0]);
-	CLS1_SendChar(packet[1]);
-	CLS1_SendChar(packet[2]);
-	CLS1_SendChar(packet[3]);
-	CLS1_SendChar(packet[4]);
+	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
 	LED1_Off();
 	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 }
 
+/*
+ * Sends a char packet to the Driver
+ */
+void ION_Motion_sendPacket(unsigned char packet[], int packetlength){
+	//int packetlength = (&packet)[1]-packet;
+
+	for(int i=0; i<packetlength; i++){
+		CLS1_SendChar(packet[i]);
+	}
+}
 
 /*
  * Calculates CRC16 of nBytes of data in byte array message
