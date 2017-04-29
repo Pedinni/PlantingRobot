@@ -36,6 +36,12 @@ void ION_PacketSerialTest(void);
 
 unsigned short crc16(unsigned char *packet, int nBytes);
 
+void setPosition(position_t pos);
+
+void setMotorSpeed(command_t command, int speed);
+
+void ION_Motion_sendPacket(unsigned char packet[], int packetlength);
+
 void ION_Motion_Driver_Init(void);
 
 #endif /* DRIVERS_LED_DRIVER_H_ */
