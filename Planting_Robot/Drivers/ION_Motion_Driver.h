@@ -21,11 +21,11 @@ typedef enum Command_{
 }command_t;
 
 typedef enum Position_{
-	Topf_9,
-	Topf_11,
-	Topf_12,
-	Topf_13,
-	Topf_14,
+	Topf_9		= 0,
+	Topf_11		= 1000,
+	Topf_12		= 2000,
+	Topf_13		= 3000,
+	Topf_14		= 4000,
 }position_t;
 
 static void ION_Motion_Task(void *pvParameters);
