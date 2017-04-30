@@ -225,6 +225,7 @@ unsigned short crc16(unsigned char *packet, int nBytes) {
 
 void ION_Motion_Driver_Init(void){
 	/* Initialisation of the IR_Sensor_Driver Task*/
+#if 0
 	if (FRTOS1_xTaskCreate(
 		ION_Motion_Task,  /* pointer to the task */
 	    (signed portCHAR *)"ION_Motion_Task", /* task name for kernel awareness debugging */
@@ -236,4 +237,5 @@ void ION_Motion_Driver_Init(void){
 	{
 		for(;;){}; /* Out of heap memory? */
 	}
+#endif
 }

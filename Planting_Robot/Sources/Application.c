@@ -11,6 +11,7 @@
 #include "ION_Motion_Driver.h"
 #include "Shell_Driver.h"
 #include "Hall_Sensor_Driver.h"
+#include "HMI_Driver.h"
 
 
 /*
@@ -27,7 +28,6 @@ void APP_Start(){
  * Initializing the defined Components
  */
 void APP_InitComponents(void){
-	CLS1_Init();
 	SYS1_Init();
 	RTT1_Init();
 	UTIL1_Init();
@@ -37,6 +37,8 @@ void APP_InitComponents(void){
 	LED_Driver_Init();
 #endif
 #if ION_MOTION_IS_ACTIVE
+	AS1_Init();							//30.04.2017
+	CLS1_Init();						//30.04.2017
 	ION_Motion_Driver_Init();
 #endif
 #if IR_SENSOR_IS_ACTIVE
@@ -44,9 +46,14 @@ void APP_InitComponents(void){
 	AdcLdd1_Init();
 #endif
 #if SHELL_IS_ACTIVE
+	AS2_Init();
+	CLS2_Init();
 	Shell_Driver_Init();
 #endif
 #if HALL_SENSOR_IS_ACTIVE
 	Hall_Sensor_Driver_Init();
+#endif
+#if HMI_IS_ACTIVE
+	HMI_Driver_Init();
 #endif
 }
