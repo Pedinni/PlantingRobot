@@ -14,8 +14,15 @@ static void ION_Motion_Task(void *pvParameters) {
 	int currentM1 = 0;
 	for(;;) {
 #if 1
+		setMotorSpeed(drive_setzeinheit_forward, 100);
+		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 		currentM1 = getMotor1Current();
-		FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+		if(currentM1 > 20){
+			LED1_On();
+		} else{
+			LED1_Off();
+		}
+		//FRTOS1_vTaskDelay(100/portTICK_RATE_MS);
 #endif
 #if 0
 		setPosition(Topf_9);
@@ -71,17 +78,17 @@ void ION_SimpleSerialTest(void){
  * vary.
  */
 void ION_PacketSerialTest(void){
-	setMotorSpeed(drive_vereinzelung_forward,0);
+	setMotorSpeed(drive_setzeinheit_forward,0);
 	LED1_Off();
 	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
 	LED1_On();
 	for(int i = 0; i < 100; i++){
-		setMotorSpeed(drive_vereinzelung_forward,i);
+		setMotorSpeed(drive_setzeinheit_forward,i);
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 	}
 	for(int i = 0; i < 100; i++){
-		setMotorSpeed(drive_vereinzelung_forward,100-i);
+		setMotorSpeed(drive_setzeinheit_forward,100-i);
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 	}
 }
@@ -155,8 +162,9 @@ void setMotorSpeed(command_t command, int speed){
  * param speed:		0... 127 	0=stop / 127=fullspeed
  */
 int getMotor1Current(){
-	unsigned char data;
-	int current = 0, packetSize = 2;
+	unsigned char data = 0;
+	int packetSize = 2;
+	int current = 0;
 	unsigned char packet[packetSize];
 
 	packet[0] = address;
@@ -165,8 +173,9 @@ int getMotor1Current(){
 	AS1_ClearRxBuf();				//clear GPS RX buffer, as it already could contain some data
 	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
 
-	FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+	FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 
+	/*
 	while(AS1_GetCharsInRxBuf()!=0){
 		if(AS1_RecvChar(&data)==ERR_OK){
 
@@ -174,16 +183,17 @@ int getMotor1Current(){
 			for(;;){}		// Cant receive char
 		}
 	}
-/*	AS1_RecvChar(&data);
-	current = (int)data;
+	*/
 	AS1_RecvChar(&data);
-	current = current<<8 & (int)data;
+	current = (int)data;
 
-	for(int i = 0; i < 4; i++){
+	AS1_RecvChar(&data);
+	current = (current<<8) | (int)data;
+
+	while(AS1_GetCharsInRxBuf()!=0){
 		AS1_RecvChar(&data);
 	}
-	*/
-	return current/100;			//Datasheet p. 71
+	return current;
 }
 
 /*
