@@ -42,6 +42,8 @@ void setMotorSpeed(command_t command, int speed);
 
 void ION_Motion_sendPacket(unsigned char packet[], int packetlength);
 
+int getMotor1Current();
+
 void ION_Motion_Driver_Init(void);
 
 #endif /* DRIVERS_LED_DRIVER_H_ */

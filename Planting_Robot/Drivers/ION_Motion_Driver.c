@@ -5,17 +5,19 @@
  *      Author: Patrick
  */
 
-
 #include "ION_Motion_Driver.h"
 
 #define address	0x80
 
 static void ION_Motion_Task(void *pvParameters) {
 	(void)pvParameters; /* parameter not used */
-
+	int currentM1 = 0;
 	for(;;) {
-		//ION_SimpleSerialTest();
-		//ION_PacketSerialTest();
+#if 1
+		currentM1 = getMotor1Current();
+		FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+#endif
+#if 0
 		setPosition(Topf_9);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
@@ -30,6 +32,8 @@ static void ION_Motion_Task(void *pvParameters) {
 
 		setPosition(Topf_14);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+#endif
+
 	}
 }
 
@@ -59,7 +63,6 @@ void ION_SimpleSerialTest(void){
 	LED1_On();
 	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 }
-
 
 /*
  * Packet serial is a buffered bidirectional serial mode. More sophisticated instructions can be sent
@@ -107,10 +110,9 @@ void setPosition(position_t pos){
 	packet[12] = 0;
 	packet[13] = 0;
 
-	packet[14] = (unsigned char)(pos>>24);
-	packet[15] = (unsigned char)(pos>>16);
-	packet[16] = (unsigned char)(pos>>8);
-	packet[17] = (unsigned char)(pos);
+	for(int i = 0; i < 4; i++){
+		packet[17-i] = (unsigned char)(pos>>(i*8));		// Position (4 Bytes)
+	}
 
 	packet[18] = 1;
 
@@ -146,6 +148,42 @@ void setMotorSpeed(command_t command, int speed){
 	packet[4] = (char)crc;					// CRC2
 
 	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
+}
+
+/*
+ * param command:	defines the command, modi
+ * param speed:		0... 127 	0=stop / 127=fullspeed
+ */
+int getMotor1Current(){
+	unsigned char data;
+	int current = 0, packetSize = 2;
+	unsigned char packet[packetSize];
+
+	packet[0] = address;
+	packet[1] = 49;					//Command: Read Motor Currents
+
+	AS1_ClearRxBuf();				//clear GPS RX buffer, as it already could contain some data
+	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
+
+	FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+
+	while(AS1_GetCharsInRxBuf()!=0){
+		if(AS1_RecvChar(&data)==ERR_OK){
+
+		} else{
+			for(;;){}		// Cant receive char
+		}
+	}
+/*	AS1_RecvChar(&data);
+	current = (int)data;
+	AS1_RecvChar(&data);
+	current = current<<8 & (int)data;
+
+	for(int i = 0; i < 4; i++){
+		AS1_RecvChar(&data);
+	}
+	*/
+	return current/100;			//Datasheet p. 71
 }
 
 /*
