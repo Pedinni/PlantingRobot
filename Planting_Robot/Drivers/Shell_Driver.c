@@ -41,8 +41,8 @@ static uint8_t ParseCommand(const unsigned char *cmd, bool *handled, const CLS2_
 
 static const CLS2_ParseCommandCallback CmdParserTable[] =
 {
-  CLS2_ParseCommand, /* default shell parser */
-  ParseCommand, /* my own shell parser */
+  CLS2_ParseCommand, 	/* default shell parser */
+  ParseCommand, 		/* my own shell parser */
 #if LED_PARSE_COMMAND_ENABLE
   LEDParseCommand,
 #endif

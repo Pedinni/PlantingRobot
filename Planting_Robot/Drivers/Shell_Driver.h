@@ -5,8 +5,8 @@
  *      Author: Patrick
  */
 
-#ifndef DRIVERS_LED_DRIVER_H_
-#define DRIVERS_LED_DRIVER_H_
+#ifndef DRIVERS_SHELL_DRIVER_H_
+#define DRIVERS_SHELL_DRIVER_H_
 
 /* Including needed modules to compile this module/procedure */
 #include "Application.h"
