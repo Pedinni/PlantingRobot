@@ -12,13 +12,19 @@
 #include "FRTOS1.h"
 #include "CLS1.h"
 #include "LED1.h"
+#include "ION_Motion_Relais.h"
 
-typedef enum Command_{
+typedef enum speedCommand_{
 	drive_setzeinheit_forward 		= 0,
 	drive_setzeinheit_backward 		= 1,
 	drive_vereinzelung_forward 		= 4,
 	drive_vereinzelung_backward 	= 5
-}command_t;
+}speedCommand_t;
+
+typedef enum positionCommand_{
+	position_setzeinheit 			= 65,
+	position_vereinzelung 			= 66
+}positionCommand_t;
 
 typedef enum Position_{
 	Topf_9		= 0,
@@ -36,9 +42,9 @@ void ION_PacketSerialTest(void);
 
 unsigned short crc16(unsigned char *packet, int nBytes);
 
-void setPosition(position_t pos);
+void setPosition(positionCommand_t command, position_t pos);
 
-void setMotorSpeed(command_t command, int speed);
+void setMotorSpeed(speedCommand_t command, int speed);
 
 void ION_Motion_sendPacket(unsigned char packet[], int packetlength);
 

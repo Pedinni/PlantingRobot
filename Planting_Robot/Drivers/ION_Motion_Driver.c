@@ -11,9 +11,13 @@
 
 static void ION_Motion_Task(void *pvParameters) {
 	(void)pvParameters; /* parameter not used */
-	int currentM1 = 0;
+
+	int currentM1 	= 0;
+	int currentPos 	= 0;
+	ION_Motion_Relais_SetVal();
+
 	for(;;) {
-#if 1
+#if 0
 		setMotorSpeed(drive_setzeinheit_forward, 100);
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 		currentM1 = getMotor1Current();
@@ -25,22 +29,32 @@ static void ION_Motion_Task(void *pvParameters) {
 		//FRTOS1_vTaskDelay(100/portTICK_RATE_MS);
 #endif
 #if 0
-		setPosition(Topf_9);
+		setPosition(position_setzeinheit, Topf_9);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(Topf_11);
+		setPosition(position_setzeinheit, Topf_11);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(Topf_12);
+		setPosition(position_setzeinheit, Topf_12);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(Topf_13);
+		setPosition(position_setzeinheit, Topf_13);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(Topf_14);
+		setPosition(position_setzeinheit, Topf_14);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 #endif
+#if 0
+		setPosition(position_vereinzelung, currentPos);
+		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
+		setPosition(position_vereinzelung, currentPos + 100);
+		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+
+		setPosition(position_vereinzelung, currentPos - 100);
+		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+#endif
+		ION_PacketSerialTest();
 	}
 }
 
@@ -78,29 +92,29 @@ void ION_SimpleSerialTest(void){
  * vary.
  */
 void ION_PacketSerialTest(void){
-	setMotorSpeed(drive_setzeinheit_forward,0);
+	setMotorSpeed(drive_vereinzelung_forward,0);
 	LED1_Off();
 	FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
 	LED1_On();
 	for(int i = 0; i < 100; i++){
-		setMotorSpeed(drive_setzeinheit_forward,i);
-		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		setMotorSpeed(drive_vereinzelung_forward,i);
+		FRTOS1_vTaskDelay(50/portTICK_RATE_MS);
 	}
 	for(int i = 0; i < 100; i++){
-		setMotorSpeed(drive_setzeinheit_forward,100-i);
-		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		setMotorSpeed(drive_vereinzelung_forward,100-i);
+		FRTOS1_vTaskDelay(50/portTICK_RATE_MS);
 	}
 }
 
-void setPosition(position_t pos){
+void setPosition(positionCommand_t command, position_t pos){
 	int packetSize = 21;
 	unsigned char packet[packetSize];
 	unsigned short crc = 0;
 
 	packet[0] = address;
 
-	packet[1] = 65;			// command
+	packet[1] = command;			// command
 
 	packet[2] = 0;			// Accel (4 Bytes)
 	packet[3] = 0;
@@ -133,7 +147,7 @@ void setPosition(position_t pos){
  * param command:	defines the command, modi
  * param speed:		0... 127 	0=stop / 127=fullspeed
  */
-void setMotorSpeed(command_t command, int speed){
+void setMotorSpeed(speedCommand_t command, int speed){
 	int packetSize = 5;
 	unsigned char packet[packetSize];
 	unsigned short crc = 0;
@@ -225,7 +239,6 @@ unsigned short crc16(unsigned char *packet, int nBytes) {
 
 void ION_Motion_Driver_Init(void){
 	/* Initialisation of the IR_Sensor_Driver Task*/
-#if 0
 	if (FRTOS1_xTaskCreate(
 		ION_Motion_Task,  /* pointer to the task */
 	    (signed portCHAR *)"ION_Motion_Task", /* task name for kernel awareness debugging */
@@ -237,5 +250,4 @@ void ION_Motion_Driver_Init(void){
 	{
 		for(;;){}; /* Out of heap memory? */
 	}
-#endif
 }

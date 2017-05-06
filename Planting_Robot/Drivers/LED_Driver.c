@@ -13,8 +13,8 @@ static void LED_Task(void *pvParameters) {
   (void)pvParameters; /* parameter not used */
   //LED1_On();
   for(;;) {
-    LED1_Neg();
-    FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+	  LED1_Neg();
+	  FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
   }
 }
 

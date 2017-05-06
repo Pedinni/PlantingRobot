@@ -76,6 +76,8 @@
 #include "BitIoLdd12.h"
 #include "BTN_Vereinzeln.h"
 #include "BitIoLdd13.h"
+#include "ION_Motion_Relais.h"
+#include "BitIoLdd14.h"
 
 #ifdef __cplusplus
 extern "C" {
