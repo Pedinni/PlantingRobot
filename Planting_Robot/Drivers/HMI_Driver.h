@@ -19,6 +19,8 @@
 #include "Event.h"
 
 #include "LED1.h"
+#include "LED2.h"
+#include "LED3.h"
 
 static void HMI_Task(void *pvParameters);
 

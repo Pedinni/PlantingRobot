@@ -27,11 +27,18 @@ void APP_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_9cm_PRESSED:
 		LED1_On();
 		break;
+	case EVNT_BTN_9cm_LPRESSED:
+		for(int i=0; i<6; i++){
+			LED1_Neg();
+			FRTOS1_vTaskDelay(50/portTICK_RATE_MS);
+		}
+		//LED1_Off();
+		break;
 	case EVNT_BTN_11cm_PRESSED:
 		LED1_Off();
 		break;
 	case EVNT_BTN_12cm_PRESSED:
-
+		LED2_Off();
 		break;
 	case EVNT_BTN_13cm_PRESSED:
 

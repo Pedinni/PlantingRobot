@@ -78,6 +78,12 @@
 #include "TI1.h"
 #include "TimerIntLdd1.h"
 #include "TU1.h"
+#include "LED2.h"
+#include "LEDpin2.h"
+#include "BitIoLdd15.h"
+#include "LED3.h"
+#include "LEDpin3.h"
+#include "BitIoLdd16.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"

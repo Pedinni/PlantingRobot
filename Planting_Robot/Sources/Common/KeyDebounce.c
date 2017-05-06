@@ -111,27 +111,27 @@ static void KEYDBNC_OnDebounceEvent(DBNC_EventKinds event, DBNC_KeySet keys) {
      /* released */
     case DBNC_EVENT_RELEASED:
     if (keys&(1<<0)) {
-    	EVNT_SetEvent(EVNT_BTN_9cm_LPRESSED);
+    	EVNT_SetEvent(EVNT_BTN_9cm_RELEASED);
     } if (keys&(1<<1)) {
-        EVNT_SetEvent(EVNT_BTN_11cm_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_11cm_RELEASED);
     } if (keys&(1<<2)) {
-        EVNT_SetEvent(EVNT_BTN_12cm_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_12cm_RELEASED);
     } if (keys&(1<<3)) {
-        EVNT_SetEvent(EVNT_BTN_13cm_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_13cm_RELEASED);
     } if (keys&(1<<4)) {
-        EVNT_SetEvent(EVNT_BTN_14cm_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_14cm_RELEASED);
     } if (keys&(1<<5)) {
-        EVNT_SetEvent(EVNT_BTN_AUTO_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_AUTO_RELEASED);
     } if (keys&(1<<6)) {
-        EVNT_SetEvent(EVNT_BTN_Setzeinheit_runter_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_Setzeinheit_runter_RELEASED);
     } if (keys&(1<<7)) {
-        EVNT_SetEvent(EVNT_BTN_Setzeinheit_hoch_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_Setzeinheit_hoch_RELEASED);
     } if (keys&(1<<8)) {
-        EVNT_SetEvent(EVNT_BTN_Vereinzelung_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_Vereinzelung_RELEASED);
     } if (keys&(1<<9)) {
-        EVNT_SetEvent(EVNT_BTN_hoeher_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_hoeher_RELEASED);
     } if (keys&(1<<10)) {
-        EVNT_SetEvent(EVNT_BTN_tiefer_LPRESSED);
+        EVNT_SetEvent(EVNT_BTN_tiefer_RELEASED);
     }
       break;
     case DBNC_EVENT_END:

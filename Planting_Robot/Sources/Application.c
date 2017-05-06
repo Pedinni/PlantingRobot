@@ -32,6 +32,8 @@ void APP_InitComponents(void){
 	RTT1_Init();
 	UTIL1_Init();
 	LED1_Init();
+	LED2_Init();
+	LED3_Init();
 
 #if LED_IS_ACTIVE
 	LED_Driver_Init();
