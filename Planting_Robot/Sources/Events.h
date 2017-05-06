@@ -78,6 +78,9 @@
 #include "BitIoLdd13.h"
 #include "ION_Motion_Relais.h"
 #include "BitIoLdd14.h"
+#include "TI1.h"
+#include "TimerIntLdd1.h"
+#include "TU1.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -341,6 +344,22 @@ void AS2_OnFullRxBuf(void);
 ** ===================================================================
 */
 void AS2_OnFreeTxBuf(void);
+
+/*
+** ===================================================================
+**     Event       :  TI1_OnInterrupt (module Events)
+**
+**     Component   :  TI1 [TimerInt]
+**     Description :
+**         When a timer interrupt occurs this event is called (only
+**         when the component is enabled - <Enable> and the events are
+**         enabled - <EnableEvent>). This event is enabled only if a
+**         <interrupt service/event> is enabled.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void TI1_OnInterrupt(void);
 
 /* END Events */
 

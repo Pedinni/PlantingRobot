@@ -13,6 +13,13 @@
 #include "WAIT1.h"
 #include "FRTOS1.h"
 
+
+
+#include "KeyDebounce.h"
+#include "Event.h"
+
+#include "LED1.h"
+
 static void HMI_Task(void *pvParameters);
 
 void HMI_Driver_Init(void);

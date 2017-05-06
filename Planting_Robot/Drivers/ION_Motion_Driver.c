@@ -202,7 +202,7 @@ int getMotor1Current(){
 	current = (int)data;
 
 	AS1_RecvChar(&data);
-	current = (current<<8) | (int)data;
+	current = (current<<8) | (int)data;			// (current<<8) + (int)data; ???
 
 	while(AS1_GetCharsInRxBuf()!=0){
 		AS1_RecvChar(&data);

@@ -56,4 +56,11 @@ void APP_InitComponents(void){
 #if HMI_IS_ACTIVE
 	HMI_Driver_Init();
 #endif
+
+	EVNT_Init();
+	TMR_Init();
+	TRG_Init();
+	KEYDBNC_Init();
+
+	EVNT_SetEvent(EVNT_STARTUP);
 }

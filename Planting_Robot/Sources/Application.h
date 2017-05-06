@@ -8,18 +8,25 @@
 #ifndef SOURCES_APPLICATION_H_
 #define SOURCES_APPLICATION_H_
 
+#include "PE_Types.h" /* common Processor Expert types: bool, NULL, ... */
+#include "Cpu.h" /* for PEcfg_RoboV2/PEcfg_RoboV1 */
+
 #include "FRTOS1.h"
 #include "UTIL1.h"
 #include "LED1.h"
 #include "Shell_Driver.h"
 //#include "LED_Driver.h"
 
+#include "Event.h"
+#include "Timer.h"
+#include "Trigger.h"
+
 /*
  * Configuration of Components
  */
 #define IR_SENSOR_IS_ACTIVE 		(0)
 #define LED_IS_ACTIVE 				(0)
-#define ION_MOTION_IS_ACTIVE 		(1)
+#define ION_MOTION_IS_ACTIVE 		(0)
 #define SHELL_IS_ACTIVE				(1)
 #define HALL_SENSOR_IS_ACTIVE		(0)
 #define HMI_IS_ACTIVE				(1)
