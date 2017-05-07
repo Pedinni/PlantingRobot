@@ -10,6 +10,7 @@
 
 #include "HMI_Driver.h"
 
+static int currentPos = 0;
 
 void APP_EventHandler(EVNT_Handle event) {
 	/*! \todo handle events */
@@ -22,6 +23,7 @@ void APP_EventHandler(EVNT_Handle event) {
 			WAIT1_Waitms(50);
 		}
 		LED1_Off();
+		ION_Motion_Relais_SetVal();
 		break;
 	}
 	case EVNT_BTN_9cm_PRESSED:
@@ -56,7 +58,9 @@ void APP_EventHandler(EVNT_Handle event) {
 
 		break;
 	case EVNT_BTN_Vereinzelung_PRESSED:
-
+		//ION_PacketSerialTest();
+		//setPosition(position_vereinzelung, currentPos += 1000);
+		//setPosition(position_setzeinheit, currentPos += 1000);
 		break;
 	case EVNT_BTN_hoeher_PRESSED:
 

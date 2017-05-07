@@ -34,13 +34,15 @@ void APP_InitComponents(void){
 	LED1_Init();
 	LED2_Init();
 	LED3_Init();
+	AS1_Init();
+	CLS1_Init();
 
 #if LED_IS_ACTIVE
 	LED_Driver_Init();
 #endif
 #if ION_MOTION_IS_ACTIVE
-	AS1_Init();							//30.04.2017
-	CLS1_Init();						//30.04.2017
+//	AS1_Init();							//30.04.2017
+//	CLS1_Init();						//30.04.2017
 	ION_Motion_Driver_Init();
 #endif
 #if IR_SENSOR_IS_ACTIVE

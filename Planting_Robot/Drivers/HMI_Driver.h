@@ -13,14 +13,14 @@
 #include "WAIT1.h"
 #include "FRTOS1.h"
 
-
-
 #include "KeyDebounce.h"
 #include "Event.h"
 
 #include "LED1.h"
 #include "LED2.h"
 #include "LED3.h"
+
+#include "ION_Motion_Driver.h"
 
 static void HMI_Task(void *pvParameters);
 
