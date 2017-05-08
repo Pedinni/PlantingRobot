@@ -18,6 +18,20 @@
 #include "ION_Motion_Relais.h"
 #include "GI2C1.h"
 
+typedef enum LED_{
+	LED_9cm,
+	LED_11cm,
+	LED_12cm,
+	LED_13cm,
+	LED_14cm,
+	LED_AUTO,
+	LED_Spindel_runter,
+	LED_Spindel_hoch,
+	LED_Vereinzelung,
+	LED_Setztiefe_hoeher,
+	LED_Setztiefe_tiefer
+}led_t;
+
 static void LED_Task(void *pvParameters);
 
 uint8_t LEDParseCommand(const unsigned char *cmd, bool *handled, const CLS2_StdIOType *io);

@@ -14,7 +14,9 @@ static void LED_Task(void *pvParameters) {
   (void)pvParameters; /* parameter not used */
   //LED1_On();
   for(;;) {
-	  LED_Driver_Test();
+//	  LED_Driver_Test();
+	  LED_Driver_setLED(LED_9cm);
+
 	  FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
   }
 }
@@ -33,6 +35,33 @@ void LED_Driver_Test(void){
 	uint8_t err = GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
 }
 
+void LED_Driver_setLED(led_t led){
+	GI2C1_SelectSlave(LP3943_Address);
+	uint8_t writeData[2] = {0x06, 0x00};
+
+	switch(led){
+		case LED_9cm:
+			//writeData[1]
+			GI2C1_WriteBlock(writeData,1,GI2C1_DO_NOT_SEND_STOP);					//Read LS0 Register
+			GI2C1_ReadBlock(&writeData[1],1,GI2C1_SEND_STOP);						//Read LS0 Register
+
+			writeData[1] = writeData[1] || (0b01 << 0);								//Set LED0
+
+			GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);			//Send new LED Register
+			break;
+		case LED_11cm:
+			GI2C1_WriteBlock(writeData,1,GI2C1_DO_NOT_SEND_STOP);					//Read LS0 Register
+			GI2C1_ReadBlock(&writeData[1],1,GI2C1_SEND_STOP);						//Read LS0 Register
+
+			writeData[1] = writeData[1] || (0b01 << 1);								//Set LED1
+
+			GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);			//Send new LED Register
+			break;
+
+		default:
+			break;
+	}
+}
 
 //void LED_Driver_Init(void){
 //	uint8_t res;
