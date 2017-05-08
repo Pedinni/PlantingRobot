@@ -84,6 +84,12 @@
 #include "LED3.h"
 #include "LEDpin3.h"
 #include "BitIoLdd16.h"
+#include "GI2C1.h"
+#include "CI2C1.h"
+#include "TMOUT1.h"
+#include "Bit1.h"
+#include "BitIoLdd17.h"
+#include "PTC.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"

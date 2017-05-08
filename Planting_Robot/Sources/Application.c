@@ -36,6 +36,8 @@ void APP_InitComponents(void){
 	LED3_Init();
 	AS1_Init();
 	CLS1_Init();
+	PTC_Init();
+	GI2C1_Init();
 
 #if LED_IS_ACTIVE
 	LED_Driver_Init();

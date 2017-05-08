@@ -11,11 +11,12 @@
 /* Including needed modules to compile this module/procedure */
 #include "Application.h"
 #include "LED1.h"
+#include "LED2.h"
 #include "WAIT1.h"
 #include "FRTOS1.h"
 #include "CLS2.h"
 #include "ION_Motion_Relais.h"
-
+#include "GI2C1.h"
 
 static void LED_Task(void *pvParameters);
 

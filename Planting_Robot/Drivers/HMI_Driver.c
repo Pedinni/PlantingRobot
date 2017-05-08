@@ -58,7 +58,7 @@ void APP_EventHandler(EVNT_Handle event) {
 
 		break;
 	case EVNT_BTN_Vereinzelung_PRESSED:
-		//ION_PacketSerialTest();
+		ION_PacketSerialTest();
 		//setPosition(position_vereinzelung, currentPos += 1000);
 		//setPosition(position_setzeinheit, currentPos += 1000);
 		break;

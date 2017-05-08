@@ -8,12 +8,13 @@
 
 #include "LED_Driver.h"
 
+#define LP3943_Address 	0b1100000
 
 static void LED_Task(void *pvParameters) {
   (void)pvParameters; /* parameter not used */
   //LED1_On();
   for(;;) {
-	  LED1_Neg();
+	  LED_Driver_Test();
 	  FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
   }
 }
@@ -25,6 +26,24 @@ void LED_Driver_Init(void){
 	}
 }
 
+void LED_Driver_Test(void){
+	uint8_t writeRegister[1] = {0x06};
+	uint8_t writeData[2] = {0x06,0b01010101};
+	GI2C1_SelectSlave(LP3943_Address);
+	uint8_t err = GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
+}
+
+
+//void LED_Driver_Init(void){
+//	uint8_t res;
+//	/*Adress Register Colorsensor */
+//	/* Command_BIT = 0x80 REG_Enable = 0x00*/
+//	 uint8_t writeDataAddr = COMMAND_BIT|REG_ENABLE;
+//	 /* Dataregister -> Data to write in Register declared above */
+//	 uint8_t writeData = ENABLE_PON|ENABLE_AEN;
+
+//	 res = I2C_WriteAddress(COLORSENS_ADDR, &writeDataAddr, sizeof(writeDataAddr), &writeData, sizeof(writeData));
+//}
 
 /*
  * Shell Parser
