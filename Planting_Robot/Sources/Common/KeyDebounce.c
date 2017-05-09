@@ -75,9 +75,9 @@ static void KEYDBNC_OnDebounceEvent(DBNC_EventKinds event, DBNC_KeySet keys) {
       } if (keys&(1<<8)) {
           EVNT_SetEvent(EVNT_BTN_Vereinzelung_PRESSED);
       } if (keys&(1<<9)) {
-          EVNT_SetEvent(EVNT_BTN_hoeher_PRESSED);
-      } if (keys&(1<<10)) {
           EVNT_SetEvent(EVNT_BTN_tiefer_PRESSED);
+      } if (keys&(1<<10)) {
+          EVNT_SetEvent(EVNT_BTN_hoeher_PRESSED);
       }
       break;
 

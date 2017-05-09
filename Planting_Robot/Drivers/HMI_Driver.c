@@ -28,8 +28,10 @@ void APP_EventHandler(EVNT_Handle event) {
 	}
 	case EVNT_BTN_9cm_PRESSED:
 		LED1_On();
+		LED_Driver_setVal(LED_9cm,ON);
 		break;
 	case EVNT_BTN_9cm_LPRESSED:
+		LED_Driver_setVal(LED_9cm,OFF);
 		for(int i=0; i<6; i++){
 			LED1_Neg();
 			FRTOS1_vTaskDelay(50/portTICK_RATE_MS);
@@ -37,36 +39,55 @@ void APP_EventHandler(EVNT_Handle event) {
 		//LED1_Off();
 		break;
 	case EVNT_BTN_11cm_PRESSED:
+		LED_Driver_setVal(LED_11cm,ON);
 		LED1_Off();
 		break;
 	case EVNT_BTN_12cm_PRESSED:
+		LED_Driver_setVal(LED_12cm,ON);
 		LED2_Off();
 		break;
 	case EVNT_BTN_13cm_PRESSED:
-
+		LED_Driver_setVal(LED_13cm,ON);
 		break;
 	case EVNT_BTN_14cm_PRESSED:
-
+		LED_Driver_setVal(LED_14cm,ON);
 		break;
 	case EVNT_BTN_AUTO_PRESSED:
-
+		LED_Driver_setVal(LED_AUTO,ON);
 		break;
 	case EVNT_BTN_Setzeinheit_runter_PRESSED:
-
+		LED_Driver_setVal(LED_Setzeinheit_runter,ON);
 		break;
 	case EVNT_BTN_Setzeinheit_hoch_PRESSED:
-
+		LED_Driver_setVal(LED_Setzeinheit_hoch,ON);
 		break;
 	case EVNT_BTN_Vereinzelung_PRESSED:
-		ION_PacketSerialTest();
+		//ION_PacketSerialTest();
+		LED_Driver_setVal(LED_Vereinzelung,ON);
 		//setPosition(position_vereinzelung, currentPos += 1000);
 		//setPosition(position_setzeinheit, currentPos += 1000);
 		break;
 	case EVNT_BTN_hoeher_PRESSED:
-
+		LED_Driver_setVal(LED_Setztiefe_normal,ON);
+		FRTOS1_vTaskDelay(200/portTICK_RATE_MS);
+		LED_Driver_setVal(LED_Setztiefe_plus_1,ON);
+		FRTOS1_vTaskDelay(200/portTICK_RATE_MS);
+		LED_Driver_setVal(LED_Setztiefe_plus_2,ON);
+		FRTOS1_vTaskDelay(200/portTICK_RATE_MS);
+		LED_Driver_setVal(LED_Setztiefe_normal,OFF);
+		LED_Driver_setVal(LED_Setztiefe_plus_1,OFF);
+		LED_Driver_setVal(LED_Setztiefe_plus_2,OFF);
 		break;
 	case EVNT_BTN_tiefer_PRESSED:
-
+		LED_Driver_setVal(LED_Setztiefe_normal,ON);
+		FRTOS1_vTaskDelay(200/portTICK_RATE_MS);
+		LED_Driver_setVal(LED_Setztiefe_minus_1,ON);
+		FRTOS1_vTaskDelay(200/portTICK_RATE_MS);
+		LED_Driver_setVal(LED_Setztiefe_minus_2,ON);
+		FRTOS1_vTaskDelay(200/portTICK_RATE_MS);
+		LED_Driver_setVal(LED_Setztiefe_normal,OFF);
+		LED_Driver_setVal(LED_Setztiefe_minus_1,OFF);
+		LED_Driver_setVal(LED_Setztiefe_minus_2,OFF);
 		break;
     default:
     	break;

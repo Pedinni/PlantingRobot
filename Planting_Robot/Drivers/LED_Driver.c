@@ -7,6 +7,7 @@
 
 
 #include "LED_Driver.h"
+#include <math.h>
 
 #define LP3943_Address 	0b1100000
 
@@ -15,7 +16,7 @@ static void LED_Task(void *pvParameters) {
   //LED1_On();
   for(;;) {
 //	  LED_Driver_Test();
-	  LED_Driver_setLED(LED_9cm);
+//	  LED_Driver_setLED(LED_9cm);
 
 	  FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
   }
@@ -35,32 +36,20 @@ void LED_Driver_Test(void){
 	uint8_t err = GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
 }
 
-void LED_Driver_setLED(led_t led){
+void LED_Driver_setVal(led_t led, state_t state){
 	GI2C1_SelectSlave(LP3943_Address);
-	uint8_t writeData[2] = {0x06, 0x00};
+	uint8_t writeData[2] = {led>>8, 0x00};		// Register, Value
 
-	switch(led){
-		case LED_9cm:
-			//writeData[1]
-			GI2C1_WriteBlock(writeData,1,GI2C1_DO_NOT_SEND_STOP);					//Read LS0 Register
-			GI2C1_ReadBlock(&writeData[1],1,GI2C1_SEND_STOP);						//Read LS0 Register
+	GI2C1_WriteBlock(writeData,1,GI2C1_DO_NOT_SEND_STOP);			//Read LS0 Register
+	GI2C1_ReadBlock(&writeData[1],1,GI2C1_SEND_STOP);				//Read LS0 Register
 
-			writeData[1] = writeData[1] || (0b01 << 0);								//Set LED0
+	uint8_t op1 = (0xFC<<(uint8_t)led);								// create Bitmask for clearing the state of the corresponding led
+	uint8_t op2 = pow(2,(uint8_t)led) - 1;
+	uint8_t clearMask = op1 | op2;
 
-			GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);			//Send new LED Register
-			break;
-		case LED_11cm:
-			GI2C1_WriteBlock(writeData,1,GI2C1_DO_NOT_SEND_STOP);					//Read LS0 Register
-			GI2C1_ReadBlock(&writeData[1],1,GI2C1_SEND_STOP);						//Read LS0 Register
-
-			writeData[1] = writeData[1] || (0b01 << 1);								//Set LED1
-
-			GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);			//Send new LED Register
-			break;
-
-		default:
-			break;
-	}
+	writeData[1] = writeData[1] &  clearMask;						// clear state which gets written
+	writeData[1] = writeData[1] | state << (uint8_t)led;			// write state
+	GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);	// Send new LED Register
 }
 
 //void LED_Driver_Init(void){

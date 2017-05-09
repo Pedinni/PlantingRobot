@@ -19,18 +19,30 @@
 #include "GI2C1.h"
 
 typedef enum LED_{
-	LED_9cm,
-	LED_11cm,
-	LED_12cm,
-	LED_13cm,
-	LED_14cm,
-	LED_AUTO,
-	LED_Spindel_runter,
-	LED_Spindel_hoch,
-	LED_Vereinzelung,
-	LED_Setztiefe_hoeher,
-	LED_Setztiefe_tiefer
+	LED_9cm					= 0x0600 + 0,		// Adress, Bits to Shift
+	LED_11cm				= 0x0600 + 2,
+	LED_12cm				= 0x0600 + 4,
+	LED_13cm				= 0x0600 + 6,
+	LED_14cm				= 0x0700 + 0,
+	LED_AUTO				= 0x0700 + 2,
+
+
+	LED_Setztiefe_plus_2	= 0x0800 + 0,
+	LED_Setztiefe_plus_1	= 0x0800 + 2,
+	LED_Setztiefe_normal	= 0x0800 + 4,
+	LED_Setztiefe_minus_1	= 0x0800 + 6,
+	LED_Setztiefe_minus_2	= 0x0900 + 0,
+	LED_Setzeinheit_hoch	= 0x0900 + 2,
+	LED_Setzeinheit_runter	= 0x0900 + 4,
+	LED_Vereinzelung		= 0x0900 + 6,
 }led_t;
+
+typedef enum STATE_{
+	OFF		= 0b00,			// Output Hi-Z
+	ON		= 0b01,			// Output LOW
+	DIM0	= 0b10,			// Output dims
+	DIM1	= 0b11			// Output dims
+} state_t;
 
 static void LED_Task(void *pvParameters);
 

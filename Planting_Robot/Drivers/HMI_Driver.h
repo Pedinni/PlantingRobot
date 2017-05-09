@@ -21,6 +21,7 @@
 #include "LED3.h"
 
 #include "ION_Motion_Driver.h"
+#include "LED_Driver.h"
 
 static void HMI_Task(void *pvParameters);
 
