@@ -51,6 +51,41 @@ void LED_Driver_setVal(led_t led, state_t state){
 	GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);	// Send new LED Register
 }
 
+void LED_Driver_blink(led_t led, int amount, blink_frequency_t frequency){
+	for(int i =0; i<amount; i++){
+		LED_Driver_setVal(led,ON);
+		FRTOS1_vTaskDelay(frequency/portTICK_RATE_MS);
+		LED_Driver_setVal(led,OFF);
+		FRTOS1_vTaskDelay(frequency/portTICK_RATE_MS);
+	}
+}
+
+void LED_Driver_clear_Topfgroesse(){
+	LED_Driver_setVal(LED_9cm,OFF);
+	LED_Driver_setVal(LED_11cm,OFF);
+	LED_Driver_setVal(LED_12cm,OFF);
+	LED_Driver_setVal(LED_13cm,OFF);
+	LED_Driver_setVal(LED_14cm,OFF);
+	LED_Driver_setVal(LED_AUTO,OFF);
+}
+
+void LED_Driver_clear_all(){
+	LED_Driver_setVal(LED_9cm,OFF);
+	LED_Driver_setVal(LED_11cm,OFF);
+	LED_Driver_setVal(LED_12cm,OFF);
+	LED_Driver_setVal(LED_13cm,OFF);
+	LED_Driver_setVal(LED_14cm,OFF);
+	LED_Driver_setVal(LED_Setzeinheit_hoch,OFF);
+	LED_Driver_setVal(LED_Setzeinheit_runter,OFF);
+	LED_Driver_setVal(LED_Setztiefe_minus_1,OFF);
+	LED_Driver_setVal(LED_Setztiefe_minus_2,OFF);
+	LED_Driver_setVal(LED_Setztiefe_normal,OFF);
+	LED_Driver_setVal(LED_Setztiefe_plus_1,OFF);
+	LED_Driver_setVal(LED_Setztiefe_plus_2,OFF);
+	LED_Driver_setVal(LED_Vereinzelung,OFF);
+
+}
+
 //void LED_Driver_Init(void){
 //	uint8_t res;
 //	/*Adress Register Colorsensor */

@@ -44,6 +44,11 @@ typedef enum STATE_{
 	DIM1	= 0b11			// Output dims
 } state_t;
 
+typedef enum BLINK_FREQUENCY_{
+	high	= 50,
+	medium	= 200,
+	low		= 500,
+} blink_frequency_t;
 static void LED_Task(void *pvParameters);
 
 void LED_Driver_Test(void);

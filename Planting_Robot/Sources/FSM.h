@@ -20,12 +20,19 @@
 #include <ION_Motion_Driver.h>
 
 typedef enum FSM_STATE_{
-	Init = 0,
+	Startup = 0,
+	Init,
+	UserInput,
 	Ready,
-	Vereinzelung,
 	Stechprozess,
-	Ausloesung
+	Vereinzelung
 } fsm_state_t;
+
+typedef struct FSM_DATA_{
+	fsm_state_t 	fsmState;
+	position_t 		positionSetzeinheit;
+	led_t 			LED_Setztiefe;
+} fsm_data_t;
 
 static void FSM_Task(void *pvParameters);
 

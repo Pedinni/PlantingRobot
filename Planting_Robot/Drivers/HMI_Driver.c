@@ -115,14 +115,14 @@ static void HMI_Task(void *pvParameters) {
 
 	for(;;) {
 		KEYDBNC_Process();
-		EVNT_HandleEvent(APP_EventHandler, TRUE);
+		//EVNT_HandleEvent(APP_EventHandler, TRUE);			//Events get Handled in the FSM
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 	}
 }
 
 void HMI_Driver_Init(void){
 	/* Initialisation of the HMI_Driver Task*/
-	if (FRTOS1_xTaskCreate(HMI_Task, (signed portCHAR *)"HMI_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, (xTaskHandle*)NULL) != pdPASS){
+	if (FRTOS1_xTaskCreate(HMI_Task, (signed portCHAR *)"HMI_Task", configMINIMAL_STACK_SIZE, (void*)NULL, 1, (xTaskHandle*)NULL) != pdPASS){
 	   for(;;){}; /* Out of heap memory? */
 	}
 }
