@@ -46,6 +46,10 @@ typedef enum STATE_{
 
 static void LED_Task(void *pvParameters);
 
+void LED_Driver_Test(void);
+
+void LED_Driver_setVal(led_t led, state_t state);
+
 uint8_t LEDParseCommand(const unsigned char *cmd, bool *handled, const CLS2_StdIOType *io);
 
 void LED_Driver_Init(void);

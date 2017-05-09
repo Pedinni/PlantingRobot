@@ -135,7 +135,8 @@ void setPosition(positionCommand_t command, position_t pos){
 		packet[17-i] = (unsigned char)(pos>>(i*8));		// Position (4 Bytes)
 	}
 
-	packet[18] = 1;
+	packet[18] = 1;			//Buffer If a value of 1 is used the current running command is stopped,
+							//any other commands in the buffer are deleted and the new command is executed.
 
 	crc = crc16(packet,19);
 	packet[19] = (char)(crc>>8);				// CRC1
