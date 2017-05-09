@@ -17,7 +17,6 @@ static void LED_Task(void *pvParameters) {
   for(;;) {
 //	  LED_Driver_Test();
 //	  LED_Driver_setLED(LED_9cm);
-
 	  FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
   }
 }

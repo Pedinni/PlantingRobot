@@ -30,6 +30,7 @@
 #define SHELL_IS_ACTIVE				(1)
 #define HALL_SENSOR_IS_ACTIVE		(0)
 #define HMI_IS_ACTIVE				(1)
+#define FSM_IS_ACTIVE				(1)
 
 
 /*

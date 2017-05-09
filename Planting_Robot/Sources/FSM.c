@@ -1,18 +1,15 @@
 /*
- * HMI_Driver.c
+ * FSM.c
  *
  *		Polls the buttons and creates an event
  *
- *		Created on: 30.04.2017
+ *		Created on: 09.05.2017
  *      Author: Patrick
  */
 
+#include "FSM.h"
 
-#include "HMI_Driver.h"
-
-static int currentPos = 0;
-
-void APP_EventHandler(EVNT_Handle event) {
+void FSM_EventHandler(EVNT_Handle event) {
 	/*! \todo handle events */
 	switch(event) {
 	case EVNT_STARTUP:
@@ -110,19 +107,45 @@ void APP_EventHandler(EVNT_Handle event) {
    } /* switch */
 }
 
-static void HMI_Task(void *pvParameters) {
+static void FSM_Task(void *pvParameters) {
 	(void)pvParameters; /* parameter not used */
+
+	fsm_state_t fsmState = Init;
 
 	for(;;) {
 		KEYDBNC_Process();
-		EVNT_HandleEvent(APP_EventHandler, TRUE);
+
+
+
+		switch(fsmState){
+		case Init:
+			LED_Driver_setVal(LED_9cm,ON);
+			FRTOS1_vTaskDelay(500/portTICK_RATE_MS);
+			LED_Driver_setVal(LED_9cm,OFF);
+			FRTOS1_vTaskDelay(500/portTICK_RATE_MS);
+
+			EVNT_HandleEvent(FSM_EventHandler, TRUE);				// Todo: Für jeden case einen anderen Eventhandler??
+			break;
+
+		case Ready:
+			break;
+		case Vereinzelung:
+			break;
+		case Stechprozess:
+			break;
+		case Ausloesung:
+			break;
+		default:
+			break;
+
+		}
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 	}
 }
 
-void HMI_Driver_Init(void){
-	/* Initialisation of the HMI_Driver Task*/
-	if (FRTOS1_xTaskCreate(HMI_Task, (signed portCHAR *)"HMI_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, (xTaskHandle*)NULL) != pdPASS){
+void FSM_Init(void){
+	/* Initialisation of the FSM Task*/
+	if (FRTOS1_xTaskCreate(FSM_Task, (signed portCHAR *)"FSM_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, (xTaskHandle*)NULL) != pdPASS){
 	   for(;;){}; /* Out of heap memory? */
 	}
 }
