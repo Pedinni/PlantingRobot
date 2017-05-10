@@ -118,6 +118,8 @@ void FSM_Startup_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_hoeher_LPRESSED:
 	case EVNT_BTN_tiefer_LPRESSED:
 		 fsmData.fsmState = Init;
+		 LED_Driver_pulseAll(FALSE);
+		 LED_Driver_clear_all();
 		break;
     default:
     	break;
@@ -131,6 +133,7 @@ static void FSM_Task(void *pvParameters) {
 	for(;;) {
 		switch(fsmData.fsmState){
 		case Startup:
+			LED_Driver_pulseAll(TRUE);
 			// TODO: Pulse all LEDs
 			EVNT_HandleEvent(FSM_Startup_EventHandler, TRUE);
 			break;

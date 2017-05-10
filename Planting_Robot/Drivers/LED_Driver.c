@@ -11,6 +11,8 @@
 
 #define LP3943_Address 	0b1100000
 
+static TaskHandle_t LED_Pulse_Task_Handle = NULL;
+
 static void LED_Task(void *pvParameters) {
   (void)pvParameters; /* parameter not used */
   //LED1_On();
@@ -21,6 +23,47 @@ static void LED_Task(void *pvParameters) {
   }
 }
 
+static void LED_Pulse_Task(void *pvParameters) {
+	  (void)pvParameters; /* parameter not used */
+
+	  uint8_t writeData[2] = {0x02,0x00};
+	  GI2C1_SelectSlave(LP3943_Address);
+	  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
+	  LED_Driver_setVal(LED_9cm ,DIM0);
+	  LED_Driver_setVal(LED_11cm ,DIM0);
+	  LED_Driver_setVal(LED_12cm ,DIM0);
+	  LED_Driver_setVal(LED_13cm ,DIM0);
+	  LED_Driver_setVal(LED_14cm ,DIM0);
+	  LED_Driver_setVal(LED_AUTO ,DIM0);
+	  LED_Driver_setVal(LED_Setzeinheit_hoch ,DIM0);
+	  LED_Driver_setVal(LED_Setzeinheit_runter ,DIM0);
+	  LED_Driver_setVal(LED_Vereinzelung ,DIM0);
+	  LED_Driver_setVal(LED_Setztiefe_minus_1 ,DIM0);
+	  LED_Driver_setVal(LED_Setztiefe_minus_2 ,DIM0);
+	  LED_Driver_setVal(LED_Setztiefe_normal ,DIM0);
+	  LED_Driver_setVal(LED_Setztiefe_plus_1 ,DIM0);
+	  LED_Driver_setVal(LED_Setztiefe_plus_2 ,DIM0);
+
+	  for(int i = 0; i<15; i++){
+		  uint8_t writeData[2] = {0x03,(uint8_t)i};
+		  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
+		  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+	 }
+
+	  for(;;) {
+		  for(int i = 0; i<100; i++){
+			  uint8_t writeData[2] = {0x03,(uint8_t)i};
+			  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
+			  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		  }
+		  for(int i =100; i>0; i--){
+			  uint8_t writeData[2] = {0x03,(uint8_t)i};
+			  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
+		  	  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		  }
+	  }
+}
+
 void LED_Driver_Init(void){
 	/* Initialisation of the LED_Driver Task*/
 	if (FRTOS1_xTaskCreate(LED_Task, (signed portCHAR *)"LED_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, (xTaskHandle*)NULL) != pdPASS){
@@ -29,7 +72,7 @@ void LED_Driver_Init(void){
 }
 
 void LED_Driver_Test(void){
-	uint8_t writeRegister[1] = {0x06};
+	//uint8_t writeRegister[1] = {0x06};
 	uint8_t writeData[2] = {0x06,0b01010101};
 	GI2C1_SelectSlave(LP3943_Address);
 	uint8_t err = GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
@@ -83,7 +126,20 @@ void LED_Driver_clear_all(){
 	LED_Driver_setVal(LED_Setztiefe_plus_1,OFF);
 	LED_Driver_setVal(LED_Setztiefe_plus_2,OFF);
 	LED_Driver_setVal(LED_Vereinzelung,OFF);
+}
 
+void LED_Driver_pulseAll(bool activ){
+	if(activ && LED_Pulse_Task_Handle == NULL){
+		if (FRTOS1_xTaskCreate(LED_Pulse_Task, (signed portCHAR *)"LED_Pulse_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, &LED_Pulse_Task_Handle) != pdPASS){
+			for(;;){}; /* Out of heap memory? */
+		}
+	} else if (activ && LED_Pulse_Task_Handle != NULL) {
+		vTaskResume(LED_Pulse_Task_Handle);
+	} else{
+		if(LED_Pulse_Task_Handle){
+			vTaskSuspend(LED_Pulse_Task_Handle);
+		}
+	}
 }
 
 //void LED_Driver_Init(void){
