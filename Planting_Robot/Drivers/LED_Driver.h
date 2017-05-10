@@ -45,9 +45,9 @@ typedef enum STATE_{
 } state_t;
 
 typedef enum BLINK_FREQUENCY_{
-	high	= 50,
+	fast	= 50,
 	medium	= 200,
-	low		= 500,
+	slow	= 500,
 } blink_frequency_t;
 static void LED_Task(void *pvParameters);
 

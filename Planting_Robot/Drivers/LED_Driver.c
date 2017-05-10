@@ -51,12 +51,12 @@ static void LED_Pulse_Task(void *pvParameters) {
 	 }
 
 	  for(;;) {
-		  for(int i = 0; i<100; i++){
+		  for(int i = 0; i<255; i++){
 			  uint8_t writeData[2] = {0x03,(uint8_t)i};
 			  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
 			  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 		  }
-		  for(int i =100; i>0; i--){
+		  for(int i = 255; i>0; i--){
 			  uint8_t writeData[2] = {0x03,(uint8_t)i};
 			  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
 		  	  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
@@ -118,6 +118,7 @@ void LED_Driver_clear_all(){
 	LED_Driver_setVal(LED_12cm,OFF);
 	LED_Driver_setVal(LED_13cm,OFF);
 	LED_Driver_setVal(LED_14cm,OFF);
+	LED_Driver_setVal(LED_AUTO,OFF);
 	LED_Driver_setVal(LED_Setzeinheit_hoch,OFF);
 	LED_Driver_setVal(LED_Setzeinheit_runter,OFF);
 	LED_Driver_setVal(LED_Setztiefe_minus_1,OFF);

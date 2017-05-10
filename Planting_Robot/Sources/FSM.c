@@ -25,7 +25,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.positionSetzeinheit = Topf_9;
 
 		LED_Driver_clear_Topfgroesse();
-		LED_Driver_blink(LED_9cm,5,high);
+		LED_Driver_blink(LED_9cm,5,fast);
 		LED_Driver_setVal(LED_9cm,ON);
 		break;
 
@@ -36,7 +36,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.positionSetzeinheit = Topf_11;
 
 		LED_Driver_clear_Topfgroesse();
-		LED_Driver_blink(LED_11cm,5,high);
+		LED_Driver_blink(LED_11cm,5,fast);
 		LED_Driver_setVal(LED_11cm,ON);
 		break;
 
@@ -47,7 +47,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.positionSetzeinheit = Topf_12;
 
 		LED_Driver_clear_Topfgroesse();
-		LED_Driver_blink(LED_12cm,5,high);
+		LED_Driver_blink(LED_12cm,5,fast);
 		LED_Driver_setVal(LED_12cm,ON);
 		break;
 
@@ -58,7 +58,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.positionSetzeinheit = Topf_13;
 
 		LED_Driver_clear_Topfgroesse();
-		LED_Driver_blink(LED_13cm,5,high);
+		LED_Driver_blink(LED_13cm,5,fast);
 		LED_Driver_setVal(LED_13cm,ON);
 		break;
 
@@ -69,7 +69,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.positionSetzeinheit = Topf_14;
 
 		LED_Driver_clear_Topfgroesse();
-		LED_Driver_blink(LED_14cm,5,high);
+		LED_Driver_blink(LED_14cm,5,fast);
 		LED_Driver_setVal(LED_14cm,ON);
 		break;
 
@@ -80,7 +80,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.positionSetzeinheit = Standby;
 
 		LED_Driver_clear_Topfgroesse();
-		LED_Driver_blink(LED_AUTO,5,high);
+		LED_Driver_blink(LED_AUTO,5,fast);
 		//LED_Driver_setVal(LED_AUTO,ON);				//Auto Push button nicht leuchten lassen, da Auto Topfgrössenerkennung nicht implementiert
 		break;
 
@@ -94,6 +94,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		break;
 
 	case EVNT_BTN_hoeher_PRESSED:
+
 		break;
 
 	case EVNT_BTN_tiefer_PRESSED:
@@ -117,9 +118,9 @@ void FSM_Startup_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_Vereinzelung_LPRESSED:
 	case EVNT_BTN_hoeher_LPRESSED:
 	case EVNT_BTN_tiefer_LPRESSED:
-		 fsmData.fsmState = Init;
-		 LED_Driver_pulseAll(FALSE);
-		 LED_Driver_clear_all();
+		LED_Driver_pulseAll(FALSE);
+		LED_Driver_clear_all();
+		fsmData.fsmState = Init;
 		break;
     default:
     	break;
@@ -138,11 +139,15 @@ static void FSM_Task(void *pvParameters) {
 			EVNT_HandleEvent(FSM_Startup_EventHandler, TRUE);
 			break;
 		case Init:
-			// Init Vereinzelung (Encoder Steps)
-			// Init Setzmechanik (Endanschlag)
-			// Init Spindel		 (Endanschlag)
-			LED_Driver_blink(LED_AUTO, 5, low);
+			// Init Vereinzelung 		(Encoder Steps)
+			// Init Verstellmechanik 	(Endanschlag)
+			// Init Setzeinheit	 		(Endanschlag)
+			LED_Driver_blink(LED_Vereinzelung, 2, medium);
+			LED_Driver_blink(LED_AUTO, 2, medium);
+			LED_Driver_blink(LED_Setzeinheit_hoch, 2, medium);
+
 			fsmData.fsmState = UserInput;
+			LED_Driver_setVal(LED_Setztiefe_normal,ON);
 			break;
 
 		case UserInput:
