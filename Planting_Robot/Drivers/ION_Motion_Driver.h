@@ -27,8 +27,7 @@ typedef enum positionCommand_{
 }positionCommand_t;
 
 typedef enum Position_{
-	Standby		= 0,
-	Topf_9		= 1,
+	Topf_9		= 0,
 	Topf_11		= 1000,
 	Topf_12		= 2000,
 	Topf_13		= 3000,

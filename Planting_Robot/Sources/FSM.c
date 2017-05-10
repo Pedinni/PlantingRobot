@@ -11,7 +11,7 @@
 
 fsm_data_t fsmData = {
 		Startup,
-		Standby,
+		fsm_pos_9cm,
 		LED_Setztiefe_normal
 };
 
@@ -22,7 +22,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_9cm_PRESSED:
 		setPosition(position_setzeinheit, Topf_9);
-		fsmData.positionSetzeinheit = Topf_9;
+		fsmData.positionSetzeinheit = fsm_pos_9cm;
 
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_9cm,5,fast);
@@ -33,7 +33,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_11cm_PRESSED:
 		setPosition(position_setzeinheit, Topf_11);
-		fsmData.positionSetzeinheit = Topf_11;
+		fsmData.positionSetzeinheit = fsm_pos_11cm;
 
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_11cm,5,fast);
@@ -44,7 +44,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_12cm_PRESSED:
 		setPosition(position_setzeinheit, Topf_12);
-		fsmData.positionSetzeinheit = Topf_12;
+		fsmData.positionSetzeinheit = fsm_pos_12cm;
 
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_12cm,5,fast);
@@ -55,7 +55,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_13cm_PRESSED:
 		setPosition(position_setzeinheit, Topf_13);
-		fsmData.positionSetzeinheit = Topf_13;
+		fsmData.positionSetzeinheit = fsm_pos_13cm;
 
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_13cm,5,fast);
@@ -66,7 +66,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_14cm_PRESSED:
 		setPosition(position_setzeinheit, Topf_14);
-		fsmData.positionSetzeinheit = Topf_14;
+		fsmData.positionSetzeinheit = fsm_pos_14cm;
 
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_14cm,5,fast);
@@ -76,8 +76,8 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_AUTO_LPRESSED:
 		//fsmData.fsmState = Ready;						//kein State-Wechsel, da Auto Topfgrössenerkennung nicht implementiert
 	case EVNT_BTN_AUTO_PRESSED:
-		setPosition(position_setzeinheit, Standby);		//ToDo: Automatische Topfgrössenerkennung
-		fsmData.positionSetzeinheit = Standby;
+		setPosition(position_setzeinheit, fsm_pos_auto);		//ToDo: Automatische Topfgrössenerkennung
+		fsmData.positionSetzeinheit = fsm_pos_auto;
 
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_AUTO,5,fast);
@@ -85,19 +85,40 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		break;
 
 	case EVNT_BTN_Setzeinheit_runter_PRESSED:
+
 		break;
 
 	case EVNT_BTN_Setzeinheit_hoch_PRESSED:
 		break;
 
 	case EVNT_BTN_Vereinzelung_PRESSED:
+
 		break;
 
 	case EVNT_BTN_hoeher_PRESSED:
+		LED_Driver_setVal(fsmData.LED_Setztiefe, OFF);
+		if(fsmData.LED_Setztiefe == LED_Setztiefe_minus_2)
+			fsmData.LED_Setztiefe = LED_Setztiefe_minus_1;
+		else if(fsmData.LED_Setztiefe == LED_Setztiefe_plus_2)
+			LED_Driver_blink(LED_Setztiefe_plus_2,2,fast);
+		else
+			fsmData.LED_Setztiefe = fsmData.LED_Setztiefe-2;
 
+		LED_Driver_setVal(fsmData.LED_Setztiefe,ON);
+		//ToDo: update höhe des Setzprozesses in der Spindel Funktion bsp.:	Spindel_Driver_Set_Setztiefe(fsmData.LED_Setztiefe)
 		break;
 
 	case EVNT_BTN_tiefer_PRESSED:
+		LED_Driver_setVal(fsmData.LED_Setztiefe, OFF);
+		if(fsmData.LED_Setztiefe == LED_Setztiefe_minus_1)
+			fsmData.LED_Setztiefe = LED_Setztiefe_minus_2;
+		else if(fsmData.LED_Setztiefe == LED_Setztiefe_minus_2)
+			LED_Driver_blink(LED_Setztiefe_minus_2,2,fast);
+		else
+			fsmData.LED_Setztiefe = fsmData.LED_Setztiefe+2;
+
+		LED_Driver_setVal(fsmData.LED_Setztiefe,ON);
+		//ToDo: update höhe des Setzprozesses in der Spindel Funktion bsp.:	Spindel_Driver_Set_Setztiefe(fsmData.LED_Setztiefe)
 		break;
     default:
     	break;
@@ -135,19 +156,19 @@ static void FSM_Task(void *pvParameters) {
 		switch(fsmData.fsmState){
 		case Startup:
 			LED_Driver_pulseAll(TRUE);
-			// TODO: Pulse all LEDs
 			EVNT_HandleEvent(FSM_Startup_EventHandler, TRUE);
 			break;
 		case Init:
-			// Init Vereinzelung 		(Encoder Steps)
-			// Init Verstellmechanik 	(Endanschlag)
-			// Init Setzeinheit	 		(Endanschlag)
+			// ToDo: Init Vereinzelung 		(Encoder Steps)
+			// ToDo: Init Verstellmechanik 	(Endanschlag)
+			// ToDo: Init Setzeinheit	 		(Endanschlag)
 			LED_Driver_blink(LED_Vereinzelung, 2, medium);
 			LED_Driver_blink(LED_AUTO, 2, medium);
 			LED_Driver_blink(LED_Setzeinheit_hoch, 2, medium);
 
 			fsmData.fsmState = UserInput;
 			LED_Driver_setVal(LED_Setztiefe_normal,ON);
+			LED_Driver_setVal(LED_9cm,ON);
 			break;
 
 		case UserInput:
