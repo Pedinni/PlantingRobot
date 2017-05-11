@@ -27,12 +27,19 @@ typedef enum positionCommand_{
 }positionCommand_t;
 
 typedef enum Position_{
-	Topf_9		= 0,
-	Topf_11		= 1000,
-	Topf_12		= 2000,
-	Topf_13		= 3000,
-	Topf_14		= 4000,
+	Topf_9	= 0,
+	Topf_11,
+	Topf_12,
+	Topf_13,
+	Topf_14,
+	Topf_auto,
+	Position_Vereinzelung
 }position_t;
+
+typedef struct ION_MOTION_DATA_{
+	position_t 	Topfgroesse;
+	int			EncoderVereinzelung;
+}ion_motion_data_t;
 
 static void ION_Motion_Task(void *pvParameters);
 

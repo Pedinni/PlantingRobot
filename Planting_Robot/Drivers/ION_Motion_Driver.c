@@ -9,6 +9,19 @@
 
 #define address	0x80
 
+#define position_Topf_9 	0
+#define position_Topf_11 	1000
+#define position_Topf_12 	2000
+#define position_Topf_13 	3000
+#define position_Topf_14 	4000
+
+#define StepsVereinzelung	-2000
+
+ion_motion_data_t data ={
+		0,
+		0
+};
+
 static void ION_Motion_Task(void *pvParameters) {
 	(void)pvParameters; /* parameter not used */
 
@@ -108,6 +121,26 @@ void ION_PacketSerialTest(void){
 }
 
 void setPosition(positionCommand_t command, position_t pos){
+	int encodedPosition;
+
+	switch(pos){
+	case Topf_9:
+		encodedPosition = position_Topf_9; break;
+	case Topf_11:
+		encodedPosition = position_Topf_11; break;
+	case Topf_12:
+		encodedPosition = position_Topf_12; break;
+	case Topf_13:
+		encodedPosition = position_Topf_13; break;
+	case Topf_14:
+		encodedPosition = position_Topf_14; break;
+	case Position_Vereinzelung:
+		data.EncoderVereinzelung += StepsVereinzelung;
+		encodedPosition = data.EncoderVereinzelung;
+	default:
+		break;
+	}
+
 	int packetSize = 21;
 	unsigned char packet[packetSize];
 	unsigned short crc = 0;
@@ -132,7 +165,7 @@ void setPosition(positionCommand_t command, position_t pos){
 	packet[13] = 0;
 
 	for(int i = 0; i < 4; i++){
-		packet[17-i] = (unsigned char)(pos>>(i*8));		// Position (4 Bytes)
+		packet[17-i] = (unsigned char)(encodedPosition>>(i*8));		// Position (4 Bytes)
 	}
 
 	packet[18] = 1;			//Buffer If a value of 1 is used the current running command is stopped,

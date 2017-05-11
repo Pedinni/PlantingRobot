@@ -28,18 +28,9 @@ typedef enum FSM_STATE_{
 	Vereinzelung
 } fsm_state_t;
 
-typedef enum POS_SETZEINHEIT_{
-	fsm_pos_9cm = 0,
-	fsm_pos_11cm,
-	fsm_pos_12cm,
-	fsm_pos_13cm,
-	fsm_pos_14cm,
-	fsm_pos_auto
-} pos_setzeinheit_t;
-
 typedef struct FSM_DATA_{
 	fsm_state_t 		fsmState;
-	pos_setzeinheit_t 	positionSetzeinheit;
+	position_t 			positionSetzeinheit;
 	int					positionVereinzelung;
 	led_t 				LED_Setztiefe;
 } fsm_data_t;
