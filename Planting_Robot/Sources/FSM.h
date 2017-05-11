@@ -40,6 +40,7 @@ typedef enum POS_SETZEINHEIT_{
 typedef struct FSM_DATA_{
 	fsm_state_t 		fsmState;
 	pos_setzeinheit_t 	positionSetzeinheit;
+	int					positionVereinzelung;
 	led_t 				LED_Setztiefe;
 } fsm_data_t;
 

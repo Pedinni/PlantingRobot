@@ -9,9 +9,12 @@
 
 #include "FSM.h"
 
+#define vereinzelungSteps	2000
+
 fsm_data_t fsmData = {
 		Startup,
 		fsm_pos_9cm,
+		0,
 		LED_Setztiefe_normal
 };
 
@@ -92,7 +95,8 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		break;
 
 	case EVNT_BTN_Vereinzelung_PRESSED:
-
+		fsmData.positionVereinzelung -= vereinzelungSteps;
+		setPosition(position_vereinzelung,fsmData.positionVereinzelung);
 		break;
 
 	case EVNT_BTN_hoeher_PRESSED:
@@ -152,6 +156,7 @@ static void FSM_Task(void *pvParameters) {
 	(void)pvParameters; /* parameter not used */
 
 	LED_Driver_clear_all();
+	ION_Motion_Relais_ClrVal();
 	for(;;) {
 		switch(fsmData.fsmState){
 		case Startup:
@@ -169,6 +174,7 @@ static void FSM_Task(void *pvParameters) {
 			fsmData.fsmState = UserInput;
 			LED_Driver_setVal(LED_Setztiefe_normal,ON);
 			LED_Driver_setVal(LED_9cm,ON);
+			ION_Motion_Relais_SetVal();
 			break;
 
 		case UserInput:

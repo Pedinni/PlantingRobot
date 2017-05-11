@@ -28,7 +28,7 @@
 #define LED_IS_ACTIVE 				(0)
 #define ION_MOTION_IS_ACTIVE 		(0)
 #define SHELL_IS_ACTIVE				(1)
-#define HALL_SENSOR_IS_ACTIVE		(0)
+#define HALL_SENSOR_IS_ACTIVE		(1)
 #define HMI_IS_ACTIVE				(1)
 #define FSM_IS_ACTIVE				(1)
 

@@ -3,7 +3,7 @@
   <Header>
     <Name>Planting_Robot</Name>
     <SavedBy>Patrick</SavedBy>
-    <ModificationStamp>38</ModificationStamp>
+    <ModificationStamp>41</ModificationStamp>
     <Date>2017-03-22</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.12.2.RT7_b1550-0615</PEversion>
@@ -29,7 +29,7 @@
     <UseExistingModules>true</UseExistingModules>
     <RenamePeripheries>false</RenamePeripheries>
     <Autodependency>true</Autodependency>
-    <ProjectCompNumb>99</ProjectCompNumb>
+    <ProjectCompNumb>100</ProjectCompNumb>
     <DelUnusedPreviouslyGenFiles>true</DelUnusedPreviouslyGenFiles>
     <GeneratedCodeFrozen>false</GeneratedCodeFrozen>
     <AssignInitComponentNameToPrph>true</AssignInitComponentNameToPrph>
@@ -19607,7 +19607,7 @@
         <ItemSymbol>_Pin</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>PTE4/SPI1_PCS0</Value>
+        <Value>ADC0_SE14/TSI0_CH13/PTC0/EXTRG_IN/CMP0_OUT</Value>
         <SharedPrphMode>false</SharedPrphMode>
       </ItemState>
       <ItemState>
@@ -19653,7 +19653,7 @@
               <ItemSymbol>_Pin</ItemSymbol>
               <ReadOnly>false</ReadOnly>
               <UserReadOnly>false</UserReadOnly>
-              <Value>PTE4/SPI1_PCS0</Value>
+              <Value>ADC0_SE14/TSI0_CH13/PTC0/EXTRG_IN/CMP0_OUT</Value>
               <SharedPrphMode>false</SharedPrphMode>
             </ItemState>
             <ItemState>
@@ -34250,8 +34250,8 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>false</Value>
-        <Expanded>false</Expanded>
+        <Value>true</Value>
+        <Expanded>true</Expanded>
       </ItemState>
       <ItemState>
         <ItemSymbol>PinOutput0</ItemSymbol>
@@ -34309,8 +34309,8 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Index>0</Index>
-        <EnumSymbVal>noInit</EnumSymbVal>
+        <Index>1</Index>
+        <EnumSymbVal>enable</EnumSymbVal>
       </ItemState>
       <ItemState>
         <ItemSymbol>PullSelect0FeatureCondGroup</ItemSymbol>
