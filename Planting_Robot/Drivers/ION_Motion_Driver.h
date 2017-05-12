@@ -16,14 +16,14 @@
 #include "Hall_Sensor.h"
 
 typedef enum ION_COMMAND_{
-	drive_setzeinheit_forward 		= 0,			//0
-	drive_setzeinheit_backward 		= 1,			//1
-	drive_vereinzelung_forward 		= 4,			//4
-	drive_vereinzelung_backward 	= 5,			//5
-	set_encoder_setzeinheit			= 22,			//22
-	set_encoder_vereinzelung		= 23,			//23
-	set_position_setzeinheit 		= 65,			//65
-	set_position_vereinzelung 		= 66			//66
+	drive_setzeinheit_backward 		= 5,			//1
+	drive_setzeinheit_forward 		= 4,			//0
+	drive_vereinzelung_backward 	= 1,			//5
+	drive_vereinzelung_forward 		= 0,			//4
+	set_encoder_vereinzelung		= 22,			//23
+	set_encoder_setzeinheit			= 23,			//22
+	set_position_vereinzelung 		= 65,			//66
+	set_position_setzeinheit 		= 66			//65
 } ion_command_t;
 
 typedef enum Position_{
