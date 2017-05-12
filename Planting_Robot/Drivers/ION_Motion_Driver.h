@@ -13,18 +13,18 @@
 #include "CLS1.h"
 #include "LED1.h"
 #include "ION_Motion_Relais.h"
+#include "Hall_Sensor.h"
 
-typedef enum speedCommand_{
-	drive_setzeinheit_forward 		= 0,
-	drive_setzeinheit_backward 		= 1,
-	drive_vereinzelung_forward 		= 4,
-	drive_vereinzelung_backward 	= 5
-}speedCommand_t;
-
-typedef enum positionCommand_{
-	position_setzeinheit 			= 65,
-	position_vereinzelung 			= 66
-}positionCommand_t;
+typedef enum ION_COMMAND_{
+	drive_setzeinheit_forward 		= 0,			//0
+	drive_setzeinheit_backward 		= 1,			//1
+	drive_vereinzelung_forward 		= 4,			//4
+	drive_vereinzelung_backward 	= 5,			//5
+	set_encoder_setzeinheit			= 22,			//22
+	set_encoder_vereinzelung		= 23,			//23
+	set_position_setzeinheit 		= 65,			//65
+	set_position_vereinzelung 		= 66			//66
+} ion_command_t;
 
 typedef enum Position_{
 	Topf_9	= 0,
@@ -33,7 +33,8 @@ typedef enum Position_{
 	Topf_13,
 	Topf_14,
 	Topf_auto,
-	Position_Vereinzelung
+	Counts_Vereinzelung,
+	Offset_Vereinzelung
 }position_t;
 
 typedef struct ION_MOTION_DATA_{
@@ -49,9 +50,9 @@ void ION_PacketSerialTest(void);
 
 unsigned short crc16(unsigned char *packet, int nBytes);
 
-void setPosition(positionCommand_t command, position_t pos);
+void setPosition(ion_command_t command, position_t pos);
 
-void setMotorSpeed(speedCommand_t command, int speed);
+void setMotorSpeed(ion_command_t command, int speed);
 
 void ION_Motion_sendPacket(unsigned char packet[], int packetlength);
 

@@ -63,7 +63,7 @@ void APP_InitComponents(void){
 	HMI_Driver_Init();
 #endif
 #if FSM_IS_ACTIVE
-	FSM_Init();
+FSM_Init();
 #endif
 	EVNT_Init();
 	TMR_Init();

@@ -20,6 +20,7 @@
 #include "Event.h"
 #include "Timer.h"
 #include "Trigger.h"
+#include "PTC.h"
 
 /*
  * Configuration of Components

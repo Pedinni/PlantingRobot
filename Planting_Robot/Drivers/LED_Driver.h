@@ -55,6 +55,14 @@ void LED_Driver_Test(void);
 
 void LED_Driver_setVal(led_t led, state_t state);
 
+void LED_Driver_blink(led_t led, int amount, blink_frequency_t frequency);
+
+void LED_Driver_clear_all();
+
+void LED_Driver_pulseAll(bool activ);
+
+void LED_Driver_clear_Topfgroesse();
+
 uint8_t LEDParseCommand(const unsigned char *cmd, bool *handled, const CLS2_StdIOType *io);
 
 void LED_Driver_Init(void);

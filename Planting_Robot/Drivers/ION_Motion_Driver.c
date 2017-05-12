@@ -15,7 +15,8 @@
 #define position_Topf_13 	3000
 #define position_Topf_14 	4000
 
-#define StepsVereinzelung	-2000
+#define CountsVereinzelung	-3000
+#define OffsetVereinzelung	-2068
 
 ion_motion_data_t data ={
 		0,
@@ -30,6 +31,10 @@ static void ION_Motion_Task(void *pvParameters) {
 	ION_Motion_Relais_SetVal();
 
 	for(;;) {
+		ION_Motion_Relais_SetVal();
+		setMotorSpeed(drive_vereinzelung_backward,100);
+		FRTOS1_vTaskDelay(100/portTICK_RATE_MS);
+
 #if 0
 		setMotorSpeed(drive_setzeinheit_forward, 100);
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
@@ -42,32 +47,31 @@ static void ION_Motion_Task(void *pvParameters) {
 		//FRTOS1_vTaskDelay(100/portTICK_RATE_MS);
 #endif
 #if 0
-		setPosition(position_setzeinheit, Topf_9);
+		setPosition(set_position_setzeinheit, Topf_9);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(position_setzeinheit, Topf_11);
+		setPosition(set_position_setzeinheit, Topf_11);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(position_setzeinheit, Topf_12);
+		setPosition(set_position_setzeinheit, Topf_12);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(position_setzeinheit, Topf_13);
+		setPosition(set_position_setzeinheit, Topf_13);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(position_setzeinheit, Topf_14);
+		setPosition(set_position_setzeinheit, Topf_14);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 #endif
 #if 0
-		setPosition(position_vereinzelung, currentPos);
+		setPosition(set_position_vereinzelung, currentPos);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(position_vereinzelung, currentPos + 100);
+		setPosition(set_position_vereinzelung, currentPos + 100);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 
-		setPosition(position_vereinzelung, currentPos - 100);
+		setPosition(set_position_vereinzelung, currentPos - 100);
 		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 #endif
-		ION_PacketSerialTest();
 	}
 }
 
@@ -120,7 +124,7 @@ void ION_PacketSerialTest(void){
 	}
 }
 
-void setPosition(positionCommand_t command, position_t pos){
+void setPosition(ion_command_t command, position_t pos){
 	int encodedPosition;
 
 	switch(pos){
@@ -134,9 +138,14 @@ void setPosition(positionCommand_t command, position_t pos){
 		encodedPosition = position_Topf_13; break;
 	case Topf_14:
 		encodedPosition = position_Topf_14; break;
-	case Position_Vereinzelung:
-		data.EncoderVereinzelung += StepsVereinzelung;
+	case Counts_Vereinzelung:
+		data.EncoderVereinzelung += CountsVereinzelung;
 		encodedPosition = data.EncoderVereinzelung;
+		break;
+	case Offset_Vereinzelung:
+		data.EncoderVereinzelung += OffsetVereinzelung;
+		encodedPosition = data.EncoderVereinzelung;
+		break;
 	default:
 		break;
 	}
@@ -178,10 +187,27 @@ void setPosition(positionCommand_t command, position_t pos){
 }
 
 /*
+ * param command:	defines the command
+ * Initializes the "Vereinzelung" by turning the motor until the hall sensor gets a signal,
+ * then clear the encoder counts and drive till the hole mask matches.
+ */
+void ION_Motion_Init_Vereinzelung(){
+	setMotorSpeed(drive_vereinzelung_backward,100);
+	while(Hall_Sensor_GetVal()){
+		//ToDo: timeout einbauen
+	}
+	setEncoderValue(set_encoder_vereinzelung,0);
+	FRTOS1_vTaskDelay(1/portTICK_RATE_MS);
+	setMotorSpeed(drive_vereinzelung_backward,0);
+	FRTOS1_vTaskDelay(1/portTICK_RATE_MS);
+	setPosition(set_position_vereinzelung, Offset_Vereinzelung);
+}
+
+/*
  * param command:	defines the command, modi
  * param speed:		0... 127 	0=stop / 127=fullspeed
  */
-void setMotorSpeed(speedCommand_t command, int speed){
+void setMotorSpeed(ion_command_t command, int speed){
 	int packetSize = 5;
 	unsigned char packet[packetSize];
 	unsigned short crc = 0;
@@ -201,6 +227,26 @@ void setMotorSpeed(speedCommand_t command, int speed){
 	crc = crc16(packet,3);
 	packet[3] = (char)(crc>>8);				// CRC1
 	packet[4] = (char)crc;					// CRC2
+
+	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
+}
+
+void setEncoderValue(ion_command_t command, int value){
+	int packetSize = 8;
+	unsigned char packet[packetSize];
+	unsigned short crc = 0;
+
+	packet[0] = address;
+	packet[1] = command;
+
+	packet[2] = (char)(value>>24);		// Encoder Value Byte 1... 4
+	packet[3] = (char)(value>>16);
+	packet[4] = (char)(value>>8);
+	packet[5] = (char)(value>>0);
+
+	crc = crc16(packet,6);
+	packet[6] = (char)(crc>>8);			// CRC1
+	packet[7] = (char)(crc>>0);			// CRC2
 
 	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
 }

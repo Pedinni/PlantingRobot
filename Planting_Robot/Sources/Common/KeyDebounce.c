@@ -69,9 +69,9 @@ static void KEYDBNC_OnDebounceEvent(DBNC_EventKinds event, DBNC_KeySet keys) {
       } if (keys&(1<<5)) {
         EVNT_SetEvent(EVNT_BTN_AUTO_PRESSED);
       } if (keys&(1<<6)) {
-        EVNT_SetEvent(EVNT_BTN_Setzeinheit_runter_PRESSED);
+        EVNT_SetEvent(EVNT_BTN_Setzeinheit_hoch_PRESSED);
       } if (keys&(1<<7)) {
-          EVNT_SetEvent(EVNT_BTN_Setzeinheit_hoch_PRESSED);
+          EVNT_SetEvent(EVNT_BTN_Setzeinheit_runter_PRESSED);
       } if (keys&(1<<8)) {
           EVNT_SetEvent(EVNT_BTN_Vereinzelung_PRESSED);
       } if (keys&(1<<9)) {
