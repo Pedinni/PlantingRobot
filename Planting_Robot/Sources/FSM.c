@@ -169,17 +169,20 @@ static void FSM_Task(void *pvParameters) {
 			ION_Motion_Relais_SetVal();
 
 			LED_Driver_blink(LED_Vereinzelung, 2, medium);
-			//ION_Motion_Init_Vereinzelung();// ToDo: Init Vereinzelung 		(Encoder Steps)
+			//ION_Motion_Init_Vereinzelung();	// ToDo: Init Vereinzelung 		(Encoder Steps)
 
 			LED_Driver_blink(LED_AUTO, 2, medium);
-			// ToDo: Init Verstellmechanik 	(Endanschlag)
+			ION_Motion_Init_Setzeinheit();		// ToDo: Init Verstellmechanik 	(Endanschlag)
+			fsmData.positionSetzeinheit = Topf_9;
+			LED_Driver_setVal(LED_9cm,ON);
 
 			LED_Driver_blink(LED_Setzeinheit_hoch, 2, medium);
 			// ToDo: Init Setzeinheit	 		(Endanschlag)
 
 			fsmData.fsmState = UserInput;
 			LED_Driver_setVal(LED_Setztiefe_normal,ON);
-			LED_Driver_setVal(LED_9cm,ON);
+
+
 			break;
 
 		case UserInput:

@@ -18,6 +18,9 @@
 #define CountsVereinzelung	-3000
 #define OffsetVereinzelung	-2068
 
+#define InitSetzeinheitSpeed	60			// Geschwindigkeit mit welcher der Motor für die Setzeinheit auf den Anschlag zufährt
+#define InitSetzeinheitCurrent	10			// Schwellwert ab welchem der Motor als blockiert eingestuft wird (Einheit auf Anschlag) 10 = 0.1A
+
 ion_motion_data_t IONdata ={
 		0,
 		0,
@@ -34,11 +37,14 @@ static void ION_Motion_Task(void *pvParameters) {
 	int currentPos 	= 0;
 	ION_Motion_Relais_SetVal();
 
+	FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+	ION_Motion_Init_Setzeinheit();
+
 	for(;;) {
-		setMotorSpeed(drive_setzeinheit_backward,100);
-		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
-		getMotorCurrent();
-		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		//setMotorSpeed(drive_setzeinheit_backward,100);
+		//FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		//getMotorCurrent();
+		//FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 	}
 }
 
@@ -170,6 +176,22 @@ void ION_Motion_Init_Vereinzelung(){
 }
 
 /*
+ * Initializes the "Vereinzelung" by turning the motor until the hall sensor gets a signal,
+ * then clear the encoder counts and drive till the hole mask matches.
+ */
+void ION_Motion_Init_Setzeinheit(){
+	setMotorSpeed(drive_setzeinheit_backward, InitSetzeinheitSpeed);
+	FRTOS1_vTaskDelay(200/portTICK_RATE_MS);
+	while(IONdata.Motor2Current < InitSetzeinheitCurrent){
+		getMotorCurrent();
+		//ToDo: timeout einbauen
+	}
+	setMotorSpeed(drive_setzeinheit_backward,0);
+	setEncoderValue(set_encoder_setzeinheit,0);
+	setPosition(set_position_setzeinheit, position_Topf_9);
+}
+
+/*
  * param command:	defines the command, modi
  * param speed:		0... 127 	0=stop / 127=fullspeed
  */
@@ -241,9 +263,6 @@ void getMotorCurrent(void){
 
 	IONdata.Motor1Current = sum1 / numberOfCurrentSamples;
 	IONdata.Motor2Current = sum2 / numberOfCurrentSamples;
-
-	//IONdata.Motor1Current = current >> 16;
-	//IONdata.Motor2Current = current & 0xFFFF;
 }
 
 void setEncoderValue(ion_command_t command, int value){
