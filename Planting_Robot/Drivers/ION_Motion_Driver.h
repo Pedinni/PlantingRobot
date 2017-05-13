@@ -22,6 +22,7 @@ typedef enum ION_COMMAND_{
 	drive_vereinzelung_forward 		= 0,			//4
 	set_encoder_vereinzelung		= 22,			//23
 	set_encoder_setzeinheit			= 23,			//22
+	read_motor_currents				= 49,
 	set_position_vereinzelung 		= 65,			//66
 	set_position_setzeinheit 		= 66			//65
 } ion_command_t;
@@ -37,9 +38,15 @@ typedef enum Position_{
 	Offset_Vereinzelung
 }position_t;
 
+#define numberOfCurrentSamples	5
+
 typedef struct ION_MOTION_DATA_{
 	position_t 	Topfgroesse;
 	int			EncoderVereinzelung;
+	int			Motor1CurrentSamples[numberOfCurrentSamples];
+	int			Motor2CurrentSamples[numberOfCurrentSamples];
+	int			Motor1Current;						//Vereinzelung
+	int			Motor2Current;						//Setzeinheit
 }ion_motion_data_t;
 
 static void ION_Motion_Task(void *pvParameters);
@@ -56,7 +63,7 @@ void setMotorSpeed(ion_command_t command, int speed);
 
 void ION_Motion_sendPacket(unsigned char packet[], int packetlength);
 
-int getMotor1Current();
+void getMotorCurrent(void);
 
 void ION_Motion_Driver_Init(void);
 

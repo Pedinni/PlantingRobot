@@ -18,6 +18,8 @@ fsm_data_t fsmData = {
 		LED_Setztiefe_normal
 };
 
+int current = 0;
+
 void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	/*! \todo handle events */
 	switch(event) {
@@ -79,7 +81,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_AUTO_LPRESSED:
 		//fsmData.fsmState = Ready;						//kein State-Wechsel, da Auto Topfgrössenerkennung nicht implementiert
 	case EVNT_BTN_AUTO_PRESSED:
-		setPosition(set_position_setzeinheit, Topf_auto);		//ToDo: Automatische Topfgrössenerkennung
+		//setPosition(set_position_setzeinheit, Topf_auto);		//ToDo: Automatische Topfgrössenerkennung
 		fsmData.positionSetzeinheit = Topf_auto;
 
 		LED_Driver_clear_Topfgroesse();
@@ -88,7 +90,6 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		break;
 
 	case EVNT_BTN_Setzeinheit_runter_PRESSED:
-		setEncoderValue(set_encoder_vereinzelung,0);
 		break;
 
 	case EVNT_BTN_Setzeinheit_hoch_PRESSED:
@@ -168,7 +169,7 @@ static void FSM_Task(void *pvParameters) {
 			ION_Motion_Relais_SetVal();
 
 			LED_Driver_blink(LED_Vereinzelung, 2, medium);
-			ION_Motion_Init_Vereinzelung();// ToDo: Init Vereinzelung 		(Encoder Steps)
+			//ION_Motion_Init_Vereinzelung();// ToDo: Init Vereinzelung 		(Encoder Steps)
 
 			LED_Driver_blink(LED_AUTO, 2, medium);
 			// ToDo: Init Verstellmechanik 	(Endanschlag)

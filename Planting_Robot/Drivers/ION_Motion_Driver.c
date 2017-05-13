@@ -18,7 +18,11 @@
 #define CountsVereinzelung	-3000
 #define OffsetVereinzelung	-2068
 
-ion_motion_data_t data ={
+ion_motion_data_t IONdata ={
+		0,
+		0,
+		0,
+		0,
 		0,
 		0
 };
@@ -31,47 +35,10 @@ static void ION_Motion_Task(void *pvParameters) {
 	ION_Motion_Relais_SetVal();
 
 	for(;;) {
-		ION_Motion_Relais_SetVal();
-		setMotorSpeed(drive_vereinzelung_backward,100);
-		FRTOS1_vTaskDelay(100/portTICK_RATE_MS);
-
-#if 0
-		setMotorSpeed(drive_setzeinheit_forward, 100);
+		setMotorSpeed(drive_setzeinheit_backward,100);
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
-		currentM1 = getMotor1Current();
-		if(currentM1 > 20){
-			LED1_On();
-		} else{
-			LED1_Off();
-		}
-		//FRTOS1_vTaskDelay(100/portTICK_RATE_MS);
-#endif
-#if 0
-		setPosition(set_position_setzeinheit, Topf_9);
-		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-
-		setPosition(set_position_setzeinheit, Topf_11);
-		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-
-		setPosition(set_position_setzeinheit, Topf_12);
-		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-
-		setPosition(set_position_setzeinheit, Topf_13);
-		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-
-		setPosition(set_position_setzeinheit, Topf_14);
-		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-#endif
-#if 0
-		setPosition(set_position_vereinzelung, currentPos);
-		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-
-		setPosition(set_position_vereinzelung, currentPos + 100);
-		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-
-		setPosition(set_position_vereinzelung, currentPos - 100);
-		FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-#endif
+		getMotorCurrent();
+		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 	}
 }
 
@@ -139,12 +106,12 @@ void setPosition(ion_command_t command, position_t pos){
 	case Topf_14:
 		encodedPosition = position_Topf_14; break;
 	case Counts_Vereinzelung:
-		data.EncoderVereinzelung += CountsVereinzelung;
-		encodedPosition = data.EncoderVereinzelung;
+		IONdata.EncoderVereinzelung += CountsVereinzelung;
+		encodedPosition = IONdata.EncoderVereinzelung;
 		break;
 	case Offset_Vereinzelung:
-		data.EncoderVereinzelung += OffsetVereinzelung;
-		encodedPosition = data.EncoderVereinzelung;
+		IONdata.EncoderVereinzelung += OffsetVereinzelung;
+		encodedPosition = IONdata.EncoderVereinzelung;
 		break;
 	default:
 		break;
@@ -156,7 +123,7 @@ void setPosition(ion_command_t command, position_t pos){
 
 	packet[0] = address;
 
-	packet[1] = command;			// command
+	packet[1] = command;	// command
 
 	packet[2] = 0;			// Accel (4 Bytes)
 	packet[3] = 0;
@@ -187,7 +154,6 @@ void setPosition(ion_command_t command, position_t pos){
 }
 
 /*
- * param command:	defines the command
  * Initializes the "Vereinzelung" by turning the motor until the hall sensor gets a signal,
  * then clear the encoder counts and drive till the hole mask matches.
  */
@@ -231,6 +197,55 @@ void setMotorSpeed(ion_command_t command, int speed){
 	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
 }
 
+/*
+ * param motor: FALSE = Motor 1 (Vereinzelung), TRUE = Motor 2 (Setzmechanik)
+ */
+void getMotorCurrent(void){
+	ion_command_t command = read_motor_currents;
+	unsigned char data = 0;
+	int packetSize = 2;
+	int current = 0;
+	unsigned char packet[packetSize];
+
+	packet[0] = address;
+	packet[1] = command;			//Command: Read Motor Currents
+
+	AS1_ClearRxBuf();				//clear GPS RX buffer, as it already could contain some data
+	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
+
+	FRTOS1_vTaskDelay(10/portTICK_RATE_MS);		// Wait some time for the packet to get sent
+
+	for(int i=3; i>=0; i--){
+		AS1_RecvChar(&data);
+		current = current | (int)(data<<(i*8));
+	}
+
+	while(AS1_GetCharsInRxBuf()!=0){
+		AS1_RecvChar(&data);
+	}
+
+	for(int i=(numberOfCurrentSamples-1); i>0; i--){
+		IONdata.Motor1CurrentSamples[i] = IONdata.Motor1CurrentSamples[i-1];
+		IONdata.Motor2CurrentSamples[i] = IONdata.Motor2CurrentSamples[i-1];
+	}
+
+	IONdata.Motor1CurrentSamples[0] = current >> 16;
+	IONdata.Motor2CurrentSamples[0] = current &  0xFFFF;
+
+	int sum1 = 0, sum2 = 0;
+
+	for(int i=0; i<numberOfCurrentSamples; i++){
+		sum1 += IONdata.Motor1CurrentSamples[i];
+		sum2 += IONdata.Motor2CurrentSamples[i];
+	}
+
+	IONdata.Motor1Current = sum1 / numberOfCurrentSamples;
+	IONdata.Motor2Current = sum2 / numberOfCurrentSamples;
+
+	//IONdata.Motor1Current = current >> 16;
+	//IONdata.Motor2Current = current & 0xFFFF;
+}
+
 void setEncoderValue(ion_command_t command, int value){
 	int packetSize = 8;
 	unsigned char packet[packetSize];
@@ -249,45 +264,6 @@ void setEncoderValue(ion_command_t command, int value){
 	packet[7] = (char)(crc>>0);			// CRC2
 
 	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
-}
-
-/*
- * param command:	defines the command, modi
- * param speed:		0... 127 	0=stop / 127=fullspeed
- */
-int getMotor1Current(){
-	unsigned char data = 0;
-	int packetSize = 2;
-	int current = 0;
-	unsigned char packet[packetSize];
-
-	packet[0] = address;
-	packet[1] = 49;					//Command: Read Motor Currents
-
-	AS1_ClearRxBuf();				//clear GPS RX buffer, as it already could contain some data
-	ION_Motion_sendPacket(packet, (&packet)[1]-packet);
-
-	FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
-
-	/*
-	while(AS1_GetCharsInRxBuf()!=0){
-		if(AS1_RecvChar(&data)==ERR_OK){
-
-		} else{
-			for(;;){}		// Cant receive char
-		}
-	}
-	*/
-	AS1_RecvChar(&data);
-	current = (int)data;
-
-	AS1_RecvChar(&data);
-	current = (current<<8) | (int)data;			// (current<<8) + (int)data; ???
-
-	while(AS1_GetCharsInRxBuf()!=0){
-		AS1_RecvChar(&data);
-	}
-	return current;
 }
 
 /*
