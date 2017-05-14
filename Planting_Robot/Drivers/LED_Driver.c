@@ -47,20 +47,6 @@ static void LED_Pulse_Task(void *pvParameters) {
 	  uint8_t writeData[2] = {0x02,0x00};
 	  GI2C1_SelectSlave(LP3943_Address);
 	  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
-	  LED_Driver_setVal(LED_9cm ,DIM0);
-	  LED_Driver_setVal(LED_11cm ,DIM0);
-	  LED_Driver_setVal(LED_12cm ,DIM0);
-	  LED_Driver_setVal(LED_13cm ,DIM0);
-	  LED_Driver_setVal(LED_14cm ,DIM0);
-	  LED_Driver_setVal(LED_auto ,DIM0);
-	  LED_Driver_setVal(LED_Spindel_hoch ,DIM0);
-	  LED_Driver_setVal(LED_Spindel_runter ,DIM0);
-	  LED_Driver_setVal(LED_Vereinzelung ,DIM0);
-	  LED_Driver_setVal(LED_Setztiefe_minus_1 ,DIM0);
-	  LED_Driver_setVal(LED_Setztiefe_minus_2 ,DIM0);
-	  LED_Driver_setVal(LED_Setztiefe_normal ,DIM0);
-	  LED_Driver_setVal(LED_Setztiefe_plus_1 ,DIM0);
-	  LED_Driver_setVal(LED_Setztiefe_plus_2 ,DIM0);
 
 	  /*
 	   * If the LEDs shall not totaly shut down during Pulse session.
@@ -71,7 +57,6 @@ static void LED_Pulse_Task(void *pvParameters) {
 		  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 	  }
 	  */
-
 	  for(;;) {
 		  for(int i = 0; i<255; i++){
 			  uint8_t writeData[2] = {0x03,(uint8_t)i};
@@ -84,6 +69,34 @@ static void LED_Pulse_Task(void *pvParameters) {
 		  	  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 		  }
 	  }
+}
+
+void LED_Driver_pulseAll(bool activ){
+	if(activ && LED_Pulse_Task_Handle == NULL){
+		if (FRTOS1_xTaskCreate(LED_Pulse_Task, (signed portCHAR *)"LED_Pulse_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, &LED_Pulse_Task_Handle) != pdPASS){
+			for(;;){}; /* Out of heap memory? */
+		}
+	} else if (activ && LED_Pulse_Task_Handle != NULL) {
+		vTaskResume(LED_Pulse_Task_Handle);
+	} else{
+		if(LED_Pulse_Task_Handle){
+			vTaskSuspend(LED_Pulse_Task_Handle);
+		}
+	}
+	LED_Driver_setVal(LED_9cm ,DIM0);
+	LED_Driver_setVal(LED_11cm ,DIM0);
+	LED_Driver_setVal(LED_12cm ,DIM0);
+	LED_Driver_setVal(LED_13cm ,DIM0);
+	LED_Driver_setVal(LED_14cm ,DIM0);
+	LED_Driver_setVal(LED_auto ,DIM0);
+	LED_Driver_setVal(LED_Spindel_hoch ,DIM0);
+	LED_Driver_setVal(LED_Spindel_runter ,DIM0);
+	LED_Driver_setVal(LED_Vereinzelung ,DIM0);
+	LED_Driver_setVal(LED_Setztiefe_minus_1 ,DIM0);
+	LED_Driver_setVal(LED_Setztiefe_minus_2 ,DIM0);
+	LED_Driver_setVal(LED_Setztiefe_normal ,DIM0);
+	LED_Driver_setVal(LED_Setztiefe_plus_1 ,DIM0);
+	LED_Driver_setVal(LED_Setztiefe_plus_2 ,DIM0);
 }
 
 void LED_Driver_Init(void){
@@ -126,6 +139,28 @@ void LED_Driver_blink(led_t led, int amount, blink_frequency_t frequency){
 	}
 }
 
+/*
+ * Blink a specified LED with a specified frequency.
+ * PSC Values of the LED Driver Timer were calculated as followd:
+ * PSC = (T * 160) - 1
+ */
+void LED_Driver_blink_(led_t led, blink_frequency_t frequency){
+	uint8_t PSCValue = 0;
+	switch(frequency){
+	case fast:		PSCValue = 15;
+		break;
+	case medium:	PSCValue = 63;
+		break;
+	case slow:		PSCValue = 159;
+		break;
+	}
+	uint8_t writeData[2] = {0x04, PSCValue};
+	GI2C1_SelectSlave(LP3943_Address);
+	GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
+
+	LED_Driver_setVal(led,DIM1);
+}
+
 void LED_Driver_clear_Topfgroesse(){
 	LED_Driver_setVal(LED_9cm,OFF);
 	LED_Driver_setVal(LED_11cm,OFF);
@@ -152,20 +187,6 @@ void LED_Driver_clear_all(){
 	LED_Driver_setVal(LED_Vereinzelung,OFF);
 }
 
-void LED_Driver_pulseAll(bool activ){
-	if(activ && LED_Pulse_Task_Handle == NULL){
-		if (FRTOS1_xTaskCreate(LED_Pulse_Task, (signed portCHAR *)"LED_Pulse_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, &LED_Pulse_Task_Handle) != pdPASS){
-			for(;;){}; /* Out of heap memory? */
-		}
-	} else if (activ && LED_Pulse_Task_Handle != NULL) {
-		vTaskResume(LED_Pulse_Task_Handle);
-	} else{
-		if(LED_Pulse_Task_Handle){
-			vTaskSuspend(LED_Pulse_Task_Handle);
-		}
-	}
-}
-
 int LED_Driver_Address_Encoder(led_t led){
 	switch(led){
 	case LED_9cm:  return LED_9CM;
@@ -186,17 +207,6 @@ int LED_Driver_Address_Encoder(led_t led){
 	case LED_Setztiefe_minus_2: return LED_SETZTIEFE_MINUS_2;
 	}
 }
-
-//void LED_Driver_Init(void){
-//	uint8_t res;
-//	/*Adress Register Colorsensor */
-//	/* Command_BIT = 0x80 REG_Enable = 0x00*/
-//	 uint8_t writeDataAddr = COMMAND_BIT|REG_ENABLE;
-//	 /* Dataregister -> Data to write in Register declared above */
-//	 uint8_t writeData = ENABLE_PON|ENABLE_AEN;
-
-//	 res = I2C_WriteAddress(COLORSENS_ADDR, &writeDataAddr, sizeof(writeDataAddr), &writeData, sizeof(writeData));
-//}
 
 /*
  * Shell Parser

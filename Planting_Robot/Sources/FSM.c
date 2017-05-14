@@ -162,24 +162,32 @@ static void FSM_Task(void *pvParameters) {
 		case Init:
 			ION_Motion_Relais_SetVal();
 			/*
-			 * Initialisation of the Vereinzelung
+			 * Initialisation Vereinzelung
 			 */
-			LED_Driver_blink(LED_Vereinzelung, 2, medium);
+			LED_Driver_blink_(LED_Vereinzelung, medium);
+			//LED_Driver_blink(LED_Vereinzelung, 2, medium);
 			//ION_Motion_Init_Vereinzelung();			// needs to get configured properly (define parameter)
+			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+			LED_Driver_setVal(LED_Vereinzelung,OFF);
 
 			/*
-			 *  Initialisation of the Setzeinheit
+			 * Initialisation Setzeinheit
 			 */
-			LED_Driver_blink(LED_auto, 2, medium);
+			LED_Driver_blink_(LED_auto, medium);
 			ION_Motion_Init_Setzeinheit();				// needs to get configured properly (define parameter)
 			fsmData.positionSetzeinheit = Topf_9;
+			LED_Driver_setVal(LED_auto,OFF);
 			LED_Driver_setVal(LED_9cm,ON);
 
 			/*
-			 *  Initialisation of the Spindelantrieb
+			 * Initialisation Spindelantrieb
 			 */
-			LED_Driver_blink(LED_Spindel_hoch, 2, medium);
+			LED_Driver_blink_(LED_Spindel_hoch, medium);
+			LED_Driver_blink_(LED_Spindel_runter, medium);
 			// ToDo: Init Spindelantrieb	 		(Endanschlag)
+			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+			LED_Driver_setVal(LED_Spindel_hoch,OFF);
+			LED_Driver_setVal(LED_Spindel_runter,OFF);
 
 			fsmData.fsmState = UserInput;
 			LED_Driver_setVal(LED_Setztiefe_normal,ON);

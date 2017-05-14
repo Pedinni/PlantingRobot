@@ -57,6 +57,8 @@ void LED_Driver_setVal(led_t led, state_t state);
 
 void LED_Driver_blink(led_t led, int amount, blink_frequency_t frequency);
 
+void LED_Driver_blink_(led_t led, blink_frequency_t frequency);
+
 void LED_Driver_clear_all();
 
 void LED_Driver_pulseAll(bool activ);
