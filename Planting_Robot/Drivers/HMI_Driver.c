@@ -63,15 +63,15 @@ void APP_EventHandler(EVNT_Handle event) {
 		break;
 
 	case EVNT_BTN_AUTO_PRESSED:
-		LED_Driver_setVal(LED_AUTO,ON);
+		LED_Driver_setVal(LED_auto,ON);
 		break;
 
 	case EVNT_BTN_Setzeinheit_runter_PRESSED:
-		LED_Driver_setVal(LED_Setzeinheit_runter,ON);
+		LED_Driver_setVal(LED_Spindel_runter,ON);
 		break;
 
 	case EVNT_BTN_Setzeinheit_hoch_PRESSED:
-		LED_Driver_setVal(LED_Setzeinheit_hoch,ON);
+		LED_Driver_setVal(LED_Spindel_hoch,ON);
 		break;
 
 	case EVNT_BTN_Vereinzelung_PRESSED:

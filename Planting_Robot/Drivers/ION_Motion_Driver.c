@@ -15,11 +15,13 @@
 #define position_Topf_13 	3000
 #define position_Topf_14 	4000
 
+#define InitSetzeinheitSpeed	60			// Geschwindigkeit mit welcher der Motor für die Setzeinheit auf den Anschlag zufährt
+#define InitSetzeinheitCurrent	15			// Schwellwert ab welchem der Motor als blockiert eingestuft wird (Einheit auf Anschlag) 10 = 0.1A
+
 #define CountsVereinzelung	-3000
 #define OffsetVereinzelung	-2068
 
-#define InitSetzeinheitSpeed	60			// Geschwindigkeit mit welcher der Motor für die Setzeinheit auf den Anschlag zufährt
-#define InitSetzeinheitCurrent	10			// Schwellwert ab welchem der Motor als blockiert eingestuft wird (Einheit auf Anschlag) 10 = 0.1A
+
 
 ion_motion_data_t IONdata ={
 		0,
@@ -260,7 +262,6 @@ void getMotorCurrent(void){
 		sum1 += IONdata.Motor1CurrentSamples[i];
 		sum2 += IONdata.Motor2CurrentSamples[i];
 	}
-
 	IONdata.Motor1Current = sum1 / numberOfCurrentSamples;
 	IONdata.Motor2Current = sum2 / numberOfCurrentSamples;
 }

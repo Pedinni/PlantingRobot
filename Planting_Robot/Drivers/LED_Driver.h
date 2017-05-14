@@ -19,22 +19,22 @@
 #include "GI2C1.h"
 
 typedef enum LED_{
-	LED_9cm					= 0x0600 + 0,		// Adress, Bits to Shift
-	LED_11cm				= 0x0600 + 2,
-	LED_12cm				= 0x0600 + 4,
-	LED_13cm				= 0x0600 + 6,
-	LED_14cm				= 0x0700 + 0,
-	LED_AUTO				= 0x0700 + 2,
+	LED_9cm					= 0,
+	LED_11cm				= 1,
+	LED_12cm				= 2,
+	LED_13cm				= 3,
+	LED_14cm				= 4,
+	LED_auto				= 5,
 
+	LED_Spindel_hoch		= 6,
+	LED_Spindel_runter		= 7,
+	LED_Vereinzelung		= 8,
 
-	LED_Setztiefe_plus_2	= 0x0800 + 0,
-	LED_Setztiefe_plus_1	= 0x0800 + 2,
-	LED_Setztiefe_normal	= 0x0800 + 4,
-	LED_Setztiefe_minus_1	= 0x0800 + 6,
-	LED_Setztiefe_minus_2	= 0x0900 + 0,
-	LED_Setzeinheit_hoch	= 0x0900 + 2,
-	LED_Setzeinheit_runter	= 0x0900 + 4,
-	LED_Vereinzelung		= 0x0900 + 6,
+	LED_Setztiefe_minus_2	= 9,
+	LED_Setztiefe_minus_1	= 10,
+	LED_Setztiefe_normal	= 11,
+	LED_Setztiefe_plus_1	= 12,
+	LED_Setztiefe_plus_2	= 13
 }led_t;
 
 typedef enum STATE_{
@@ -62,6 +62,8 @@ void LED_Driver_clear_all();
 void LED_Driver_pulseAll(bool activ);
 
 void LED_Driver_clear_Topfgroesse();
+
+int LED_Driver_Address_Encoder(led_t led);
 
 uint8_t LEDParseCommand(const unsigned char *cmd, bool *handled, const CLS2_StdIOType *io);
 

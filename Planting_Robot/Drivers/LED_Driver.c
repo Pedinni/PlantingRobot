@@ -11,6 +11,24 @@
 
 #define LP3943_Address 	0b1100000
 
+#define LED_9CM					(0x0600 + 0)		// Adress, Bits to Shift
+#define LED_11CM				(0x0600 + 2)
+#define LED_12CM				(0x0600 + 4)
+#define LED_13CM				(0x0600 + 6)
+#define LED_14CM				(0x0700 + 0)
+#define LED_AUTO				(0x0700 + 2)
+
+#define LED_SPINDEL_HOCH		(0x0900 + 2)
+#define LED_SPINDEL_RUNTER		(0x0900 + 4)
+#define LED_VEREINZELUNG		(0x0900 + 6)
+
+#define LED_SETZTIEFE_PLUS_2	(0x0800 + 0)
+#define LED_SETZTIEFE_PLUS_1	(0x0800 + 2)
+#define LED_SETZTIEFE_NORMAL	(0x0800 + 4)
+#define LED_SETZTIEFE_MINUS_1	(0x0800 + 6)
+#define LED_SETZTIEFE_MINUS_2	(0x0900 + 0)
+
+
 static TaskHandle_t LED_Pulse_Task_Handle = NULL;
 
 static void LED_Task(void *pvParameters) {
@@ -34,9 +52,9 @@ static void LED_Pulse_Task(void *pvParameters) {
 	  LED_Driver_setVal(LED_12cm ,DIM0);
 	  LED_Driver_setVal(LED_13cm ,DIM0);
 	  LED_Driver_setVal(LED_14cm ,DIM0);
-	  LED_Driver_setVal(LED_AUTO ,DIM0);
-	  LED_Driver_setVal(LED_Setzeinheit_hoch ,DIM0);
-	  LED_Driver_setVal(LED_Setzeinheit_runter ,DIM0);
+	  LED_Driver_setVal(LED_auto ,DIM0);
+	  LED_Driver_setVal(LED_Spindel_hoch ,DIM0);
+	  LED_Driver_setVal(LED_Spindel_runter ,DIM0);
 	  LED_Driver_setVal(LED_Vereinzelung ,DIM0);
 	  LED_Driver_setVal(LED_Setztiefe_minus_1 ,DIM0);
 	  LED_Driver_setVal(LED_Setztiefe_minus_2 ,DIM0);
@@ -44,11 +62,15 @@ static void LED_Pulse_Task(void *pvParameters) {
 	  LED_Driver_setVal(LED_Setztiefe_plus_1 ,DIM0);
 	  LED_Driver_setVal(LED_Setztiefe_plus_2 ,DIM0);
 
+	  /*
+	   * If the LEDs shall not totaly shut down during Pulse session.
+	   *
 	  for(int i = 0; i<15; i++){
 		  uint8_t writeData[2] = {0x03,(uint8_t)i};
 		  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
 		  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
-	 }
+	  }
+	  */
 
 	  for(;;) {
 		  for(int i = 0; i<255; i++){
@@ -79,18 +101,19 @@ void LED_Driver_Test(void){
 }
 
 void LED_Driver_setVal(led_t led, state_t state){
+	int LED_address = LED_Driver_Address_Encoder(led);
 	GI2C1_SelectSlave(LP3943_Address);
-	uint8_t writeData[2] = {led>>8, 0x00};		// Register, Value
+	uint8_t writeData[2] = {LED_address>>8, 0x00};		// Register, Value
 
 	GI2C1_WriteBlock(writeData,1,GI2C1_DO_NOT_SEND_STOP);			//Read LS0 Register
 	GI2C1_ReadBlock(&writeData[1],1,GI2C1_SEND_STOP);				//Read LS0 Register
 
-	uint8_t op1 = (0xFC<<(uint8_t)led);								// create Bitmask for clearing the state of the corresponding led
-	uint8_t op2 = pow(2,(uint8_t)led) - 1;
+	uint8_t op1 = (0xFC<<(uint8_t)LED_address);								// create Bitmask for clearing the state of the corresponding led
+	uint8_t op2 = pow(2,(uint8_t)LED_address) - 1;
 	uint8_t clearMask = op1 | op2;
 
 	writeData[1] = writeData[1] &  clearMask;						// clear state which gets written
-	writeData[1] = writeData[1] | state << (uint8_t)led;			// write state
+	writeData[1] = writeData[1] | state << (uint8_t)LED_address;			// write state
 	GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);	// Send new LED Register
 }
 
@@ -109,7 +132,7 @@ void LED_Driver_clear_Topfgroesse(){
 	LED_Driver_setVal(LED_12cm,OFF);
 	LED_Driver_setVal(LED_13cm,OFF);
 	LED_Driver_setVal(LED_14cm,OFF);
-	LED_Driver_setVal(LED_AUTO,OFF);
+	LED_Driver_setVal(LED_auto,OFF);
 }
 
 void LED_Driver_clear_all(){
@@ -118,9 +141,9 @@ void LED_Driver_clear_all(){
 	LED_Driver_setVal(LED_12cm,OFF);
 	LED_Driver_setVal(LED_13cm,OFF);
 	LED_Driver_setVal(LED_14cm,OFF);
-	LED_Driver_setVal(LED_AUTO,OFF);
-	LED_Driver_setVal(LED_Setzeinheit_hoch,OFF);
-	LED_Driver_setVal(LED_Setzeinheit_runter,OFF);
+	LED_Driver_setVal(LED_auto,OFF);
+	LED_Driver_setVal(LED_Spindel_hoch,OFF);
+	LED_Driver_setVal(LED_Spindel_runter,OFF);
 	LED_Driver_setVal(LED_Setztiefe_minus_1,OFF);
 	LED_Driver_setVal(LED_Setztiefe_minus_2,OFF);
 	LED_Driver_setVal(LED_Setztiefe_normal,OFF);
@@ -140,6 +163,27 @@ void LED_Driver_pulseAll(bool activ){
 		if(LED_Pulse_Task_Handle){
 			vTaskSuspend(LED_Pulse_Task_Handle);
 		}
+	}
+}
+
+int LED_Driver_Address_Encoder(led_t led){
+	switch(led){
+	case LED_9cm:  return LED_9CM;
+	case LED_11cm: return LED_11CM;
+	case LED_12cm: return LED_12CM;
+	case LED_13cm: return LED_13CM;
+	case LED_14cm: return LED_14CM;
+	case LED_auto: return LED_AUTO;
+
+	case LED_Spindel_hoch: 	 return LED_SPINDEL_HOCH;
+	case LED_Spindel_runter: return LED_SPINDEL_RUNTER;
+	case LED_Vereinzelung:   return LED_VEREINZELUNG;
+
+	case LED_Setztiefe_plus_2:  return LED_SETZTIEFE_PLUS_2;
+	case LED_Setztiefe_plus_1:  return LED_SETZTIEFE_PLUS_1;
+	case LED_Setztiefe_normal:  return LED_SETZTIEFE_NORMAL;
+	case LED_Setztiefe_minus_1: return LED_SETZTIEFE_MINUS_1;
+	case LED_Setztiefe_minus_2: return LED_SETZTIEFE_MINUS_2;
 	}
 }
 
