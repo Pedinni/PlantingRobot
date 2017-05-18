@@ -90,9 +90,14 @@
 #include "GI2C1.h"
 #include "CI2C1.h"
 #include "TMOUT1.h"
-#include "Bit1.h"
 #include "BitIoLdd17.h"
 #include "PTC.h"
+#include "AS3.h"
+#include "ASerialLdd3.h"
+#include "CLS3.h"
+#include "DC_OK.h"
+#include "BitIoLdd18.h"
+#include "Stop_IN.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -372,6 +377,82 @@ void AS2_OnFreeTxBuf(void);
 ** ===================================================================
 */
 void TI1_OnInterrupt(void);
+
+/*
+** ===================================================================
+**     Event       :  AS3_OnError (module Events)
+**
+**     Component   :  AS3 [AsynchroSerial]
+**     Description :
+**         This event is called when a channel error (not the error
+**         returned by a given method) occurs. The errors can be read
+**         using <GetError> method.
+**         The event is available only when the <Interrupt
+**         service/event> property is enabled.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void AS3_OnError(void);
+
+/*
+** ===================================================================
+**     Event       :  AS3_OnRxChar (module Events)
+**
+**     Component   :  AS3 [AsynchroSerial]
+**     Description :
+**         This event is called after a correct character is received.
+**         The event is available only when the <Interrupt
+**         service/event> property is enabled and either the <Receiver>
+**         property is enabled or the <SCI output mode> property (if
+**         supported) is set to Single-wire mode.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void AS3_OnRxChar(void);
+
+/*
+** ===================================================================
+**     Event       :  AS3_OnTxChar (module Events)
+**
+**     Component   :  AS3 [AsynchroSerial]
+**     Description :
+**         This event is called after a character is transmitted.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void AS3_OnTxChar(void);
+
+/*
+** ===================================================================
+**     Event       :  AS3_OnFullRxBuf (module Events)
+**
+**     Component   :  AS3 [AsynchroSerial]
+**     Description :
+**         This event is called when the input buffer is full;
+**         i.e. after reception of the last character 
+**         that was successfully placed into input buffer.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void AS3_OnFullRxBuf(void);
+
+/*
+** ===================================================================
+**     Event       :  AS3_OnFreeTxBuf (module Events)
+**
+**     Component   :  AS3 [AsynchroSerial]
+**     Description :
+**         This event is called after the last character in output
+**         buffer is transmitted.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void AS3_OnFreeTxBuf(void);
 
 /* END Events */
 

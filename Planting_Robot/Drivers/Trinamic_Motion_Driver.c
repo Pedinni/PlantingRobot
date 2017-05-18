@@ -18,6 +18,18 @@ static void Trinamic_Motion_Task(void *pvParameters) {
 }
 
 /*
+//Checksum calculation
+unsigned char i, Checksum;
+unsigned char Command[9];
+//Set the “Command” array to the desired command
+Checksum = Command[0];
+for(i=1; i<8; i++)
+Checksum+=Command[i];
+Command[8]=Checksum; //insert checksum as last byte of the command
+//Now, send the command back to the module
+*/
+
+/*
  * Sends a char packet to the Driver
  */
 void Trinamic_Motion_sendPacket(unsigned char packet[], int packetlength){
