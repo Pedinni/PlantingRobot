@@ -31,6 +31,8 @@
 
 static TaskHandle_t LED_Pulse_Task_Handle = NULL;
 
+static bool pulsing = FALSE;
+
 static void LED_Task(void *pvParameters) {
   (void)pvParameters; /* parameter not used */
   //LED1_On();
@@ -82,21 +84,26 @@ void LED_Driver_pulseAll(bool activ){
 		if(LED_Pulse_Task_Handle){
 			vTaskSuspend(LED_Pulse_Task_Handle);
 		}
+		pulsing = FALSE;
 	}
-	LED_Driver_setVal(LED_9cm ,DIM0);
-	LED_Driver_setVal(LED_11cm ,DIM0);
-	LED_Driver_setVal(LED_12cm ,DIM0);
-	LED_Driver_setVal(LED_13cm ,DIM0);
-	LED_Driver_setVal(LED_14cm ,DIM0);
-	LED_Driver_setVal(LED_auto ,DIM0);
-	LED_Driver_setVal(LED_Spindel_hoch ,DIM0);
-	LED_Driver_setVal(LED_Spindel_runter ,DIM0);
-	LED_Driver_setVal(LED_Vereinzelung ,DIM0);
-	LED_Driver_setVal(LED_Setztiefe_minus_1 ,DIM0);
-	LED_Driver_setVal(LED_Setztiefe_minus_2 ,DIM0);
-	LED_Driver_setVal(LED_Setztiefe_normal ,DIM0);
-	LED_Driver_setVal(LED_Setztiefe_plus_1 ,DIM0);
-	LED_Driver_setVal(LED_Setztiefe_plus_2 ,DIM0);
+	if(!pulsing){
+		LED_Driver_setVal(LED_9cm ,DIM0);
+		LED_Driver_setVal(LED_11cm ,DIM0);
+		LED_Driver_setVal(LED_12cm ,DIM0);
+		LED_Driver_setVal(LED_13cm ,DIM0);
+		LED_Driver_setVal(LED_14cm ,DIM0);
+		LED_Driver_setVal(LED_auto ,DIM0);
+		LED_Driver_setVal(LED_Spindel_hoch ,DIM0);
+		LED_Driver_setVal(LED_Spindel_runter ,DIM0);
+		LED_Driver_setVal(LED_Vereinzelung ,DIM0);
+		LED_Driver_setVal(LED_Setztiefe_minus_1 ,DIM0);
+		LED_Driver_setVal(LED_Setztiefe_minus_2 ,DIM0);
+		LED_Driver_setVal(LED_Setztiefe_normal ,DIM0);
+		LED_Driver_setVal(LED_Setztiefe_plus_1 ,DIM0);
+		LED_Driver_setVal(LED_Setztiefe_plus_2 ,DIM0);
+		pulsing = TRUE;
+	}
+
 }
 
 void LED_Driver_Init(void){

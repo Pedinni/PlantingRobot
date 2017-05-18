@@ -16,6 +16,7 @@
 #include "LED1.h"
 #include "Shell_Driver.h"
 //#include "LED_Driver.h"
+#include "Trinamic_Motion_Driver.h"
 
 #include "Event.h"
 #include "Timer.h"
@@ -32,6 +33,7 @@
 #define HALL_SENSOR_IS_ACTIVE		(1)
 #define HMI_IS_ACTIVE				(1)
 #define FSM_IS_ACTIVE				(1)
+#define TRINAMIC_MOTION_IS_ACTIVE	(1)
 
 
 /*

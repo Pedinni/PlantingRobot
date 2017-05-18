@@ -65,6 +65,9 @@ void APP_InitComponents(void){
 #if FSM_IS_ACTIVE
 FSM_Init();
 #endif
+#if TRINAMIC_MOTION_IS_ACTIVE
+Trinamic_Motion_Driver_Init();
+#endif
 	EVNT_Init();
 	TMR_Init();
 	TRG_Init();
