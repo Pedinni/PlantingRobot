@@ -10,16 +10,17 @@
 #define address	0x80
 
 #define position_Topf_9 	0
-#define position_Topf_11 	1000
-#define position_Topf_12 	2000
-#define position_Topf_13 	3000
-#define position_Topf_14 	4000
+#define position_Topf_11 	300
+#define position_Topf_12 	600
+#define position_Topf_13 	900
+#define position_Topf_14 	1200
 
 #define InitSetzeinheitSpeed	60			// Geschwindigkeit mit welcher der Motor für die Setzeinheit auf den Anschlag zufährt
 #define InitSetzeinheitCurrent	15			// Schwellwert ab welchem der Motor als blockiert eingestuft wird (Einheit auf Anschlag) 10 = 0.1A
 
-#define CountsVereinzelung	-3000
-#define OffsetVereinzelung	-2068
+#define CountsVereinzelung	-3025
+#define OffsetVereinzelung	-1700
+#define STEPVEREINZELUNGTIMOUT 50
 
 
 
@@ -99,7 +100,7 @@ void ION_PacketSerialTest(void){
 	}
 }
 
-void setPosition(ion_command_t command, position_t pos){
+void ION_Motion_setPosition(ion_command_t command, position_t pos){
 	int encodedPosition;
 
 	switch(pos){
@@ -171,10 +172,30 @@ void ION_Motion_Init_Vereinzelung(){
 		//ToDo: timeout einbauen
 	}
 	setEncoderValue(set_encoder_vereinzelung,0);
+	IONdata.EncoderVereinzelung = 0;
 	FRTOS1_vTaskDelay(1/portTICK_RATE_MS);
 	setMotorSpeed(drive_vereinzelung_backward,0);
 	FRTOS1_vTaskDelay(1/portTICK_RATE_MS);
-	setPosition(set_position_vereinzelung, Offset_Vereinzelung);
+	ION_Motion_setPosition(set_position_vereinzelung, Offset_Vereinzelung);
+}
+
+void ION_Motion_step_Vereinzelung(){
+	bool hall = TRUE;
+	int timer = 0;
+	ION_Motion_setPosition(set_position_vereinzelung, Counts_Vereinzelung);
+	while(hall && timer <= STEPVEREINZELUNGTIMOUT){
+		hall = Hall_Sensor_GetVal();
+		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		timer++;
+	}
+	if(!hall){
+		setEncoderValue(set_encoder_vereinzelung,0);
+		IONdata.EncoderVereinzelung = 0;
+		FRTOS1_vTaskDelay(1/portTICK_RATE_MS);
+		setMotorSpeed(drive_vereinzelung_backward,0);
+		FRTOS1_vTaskDelay(1/portTICK_RATE_MS);
+		ION_Motion_setPosition(set_position_vereinzelung, Offset_Vereinzelung);
+	}
 }
 
 /*
@@ -190,7 +211,7 @@ void ION_Motion_Init_Setzeinheit(){
 	}
 	setMotorSpeed(drive_setzeinheit_backward,0);
 	setEncoderValue(set_encoder_setzeinheit,0);
-	setPosition(set_position_setzeinheit, position_Topf_9);
+	ION_Motion_setPosition(set_position_setzeinheit, position_Topf_9);
 }
 
 /*

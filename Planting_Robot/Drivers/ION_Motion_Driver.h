@@ -57,7 +57,7 @@ void ION_PacketSerialTest(void);
 
 unsigned short crc16(unsigned char *packet, int nBytes);
 
-void setPosition(ion_command_t command, position_t pos);
+void ION_Motion_setPosition(ion_command_t command, position_t pos);
 
 void ION_Motion_Init_Vereinzelung();
 

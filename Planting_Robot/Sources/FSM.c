@@ -26,7 +26,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_9cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_9cm_PRESSED:
-		setPosition(set_position_setzeinheit, Topf_9);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_9);
 		fsmData.positionSetzeinheit = Topf_9;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_9cm,5,fast);
@@ -36,7 +36,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_11cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_11cm_PRESSED:
-		setPosition(set_position_setzeinheit, Topf_11);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_11);
 		fsmData.positionSetzeinheit = Topf_11;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_11cm,5,fast);
@@ -46,7 +46,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_12cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_12cm_PRESSED:
-		setPosition(set_position_setzeinheit, Topf_12);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_12);
 		fsmData.positionSetzeinheit = Topf_12;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_12cm,5,fast);
@@ -56,7 +56,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_13cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_13cm_PRESSED:
-		setPosition(set_position_setzeinheit, Topf_13);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_13);
 		fsmData.positionSetzeinheit = Topf_13;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_13cm,5,fast);
@@ -66,7 +66,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_14cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_14cm_PRESSED:
-		setPosition(set_position_setzeinheit, Topf_14);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_14);
 		fsmData.positionSetzeinheit = Topf_14;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_14cm,5,fast);
@@ -76,7 +76,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_AUTO_LPRESSED:
 		//fsmData.fsmState = Ready;								//kein State-Wechsel, da Auto Topfgrössenerkennung nicht implementiert
 	case EVNT_BTN_AUTO_PRESSED:
-		//setPosition(set_position_setzeinheit, Topf_auto);		//ToDo: Automatische Topfgrössenerkennung
+		//ION_Motion_setPosition(set_position_setzeinheit, Topf_auto);		//ToDo: Automatische Topfgrössenerkennung
 		fsmData.positionSetzeinheit = Topf_auto;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_auto,5,fast);
@@ -90,9 +90,9 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		break;
 
 	case EVNT_BTN_Vereinzelung_PRESSED:
-		//fsmData.positionVereinzelung -= vereinzelungSteps;
-		setPosition(set_position_vereinzelung, Counts_Vereinzelung);
-		LED_Driver_blink(LED_Vereinzelung,2,medium);
+		LED_Driver_blink_(LED_Vereinzelung,medium);
+		ION_Motion_step_Vereinzelung();
+		LED_Driver_setVal(LED_Vereinzelung,OFF);
 		break;
 
 	case EVNT_BTN_hoeher_PRESSED:
@@ -161,12 +161,12 @@ static void FSM_Task(void *pvParameters) {
 
 		case Init:
 			ION_Motion_Relais_SetVal();
+			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 			/*
 			 * Initialisation Vereinzelung
 			 */
 			LED_Driver_blink_(LED_Vereinzelung, medium);
-			//ION_Motion_Init_Vereinzelung();			// needs to get configured properly (define parameter)
-			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+			ION_Motion_Init_Vereinzelung();					// needs to get configured properly (define parameter)
 			LED_Driver_setVal(LED_Vereinzelung,OFF);
 
 			/*
