@@ -23,7 +23,8 @@ static void Trinamic_Motion_Task(void *pvParameters) {
 #if 0
 		Trinamic_Motion_Test();
 #endif
-		Trinamic_Motion_sendPacket(MVP, 0x01, value_pos1);
+		LED2_On();
+		Trinamic_Motion_sendPacket(ROL, 0x01, value_fast);
 		FRTOS1_vTaskDelay(5000/portTICK_RATE_MS);
 	}
 }

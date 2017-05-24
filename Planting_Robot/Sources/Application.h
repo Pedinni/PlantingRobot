@@ -33,7 +33,7 @@
 #define HALL_SENSOR_IS_ACTIVE		(1)
 #define HMI_IS_ACTIVE				(1)
 #define FSM_IS_ACTIVE				(1)
-#define TRINAMIC_MOTION_IS_ACTIVE	(1)
+#define TRINAMIC_MOTION_IS_ACTIVE	(0)
 
 
 /*
