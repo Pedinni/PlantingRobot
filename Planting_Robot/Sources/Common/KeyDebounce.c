@@ -18,7 +18,7 @@
  * \return Port bits
  */
 static DBNC_KeySet KEYDBNC_GetKeys(void) {
-  DBNC_KeySet keys = 0;
+	DBNC_KeySet keys = 0;
   	  keys =  ((int)!BTN_9cm_GetVal()  << 0) +
   			  ((int)!BTN_11cm_GetVal() << 1) +
 			  ((int)!BTN_12cm_GetVal() << 2) +

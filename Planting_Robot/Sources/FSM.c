@@ -83,10 +83,20 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		//LED_Driver_setVal(LED_AUTO,ON);						//Auto Push button nicht leuchten lassen, da Auto Topfgrössenerkennung nicht implementiert
 		break;
 
-	case EVNT_BTN_Setzeinheit_runter_PRESSED:
+	case EVNT_BTN_Setzeinheit_runter_LPRESSED:
+		Trinamic_Motion_sendPacket(SAP, 0x06, 1000);			//Set the max allowed motor current to 1000mA
+		Trinamic_Motion_sendPacket(ROL, 0x00, 20);
+		break;
+	case EVNT_BTN_Setzeinheit_runter_RELEASED:
+		Trinamic_Motion_sendPacket(MST, 0x00, 0x00);
 		break;
 
-	case EVNT_BTN_Setzeinheit_hoch_PRESSED:
+	case EVNT_BTN_Setzeinheit_hoch_LPRESSED:
+		Trinamic_Motion_sendPacket(SAP, 0x06, 1000);			//Set the max allowed motor current to 1000mA
+		Trinamic_Motion_sendPacket(ROR, 0x00, 20);
+		break;
+	case EVNT_BTN_Setzeinheit_hoch_RELEASED:
+		Trinamic_Motion_sendPacket(MST, 0x00, 0x00);
 		break;
 
 	case EVNT_BTN_Vereinzelung_PRESSED:
@@ -104,6 +114,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 			fsmData.LED_Setztiefe = fsmData.LED_Setztiefe+1;
 		}
 		LED_Driver_setVal(fsmData.LED_Setztiefe,ON);
+		Trinamic_Motion_setSetztiefe(fsmData.LED_Setztiefe);
 		//ToDo: update höhe des Setzprozesses in der Spindel Funktion bsp.:	Spindel_Driver_Set_Setztiefe(fsmData.LED_Setztiefe)
 		break;
 
@@ -116,6 +127,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 			fsmData.LED_Setztiefe = fsmData.LED_Setztiefe-1;
 		}
 		LED_Driver_setVal(fsmData.LED_Setztiefe,ON);
+		Trinamic_Motion_setSetztiefe(fsmData.LED_Setztiefe);
 		//ToDo: update höhe des Setzprozesses in der Spindel Funktion bsp.:	Spindel_Driver_Set_Setztiefe(fsmData.LED_Setztiefe)
 		break;
 
@@ -141,6 +153,28 @@ void FSM_Startup_EventHandler(EVNT_Handle event) {
 		LED_Driver_pulseAll(FALSE);
 		LED_Driver_clear_all();
 		fsmData.fsmState = Init;
+		break;
+    default:
+    	break;
+   } /* switch */
+}
+
+
+void FSM_Ready_EventHandler(EVNT_Handle event) {
+	switch(event) {
+	case EVNT_BTN_9cm_PRESSED:				// Any Button Press
+	case EVNT_BTN_11cm_PRESSED:
+	case EVNT_BTN_12cm_PRESSED:
+	case EVNT_BTN_13cm_PRESSED:
+	case EVNT_BTN_14cm_PRESSED:
+	case EVNT_BTN_AUTO_PRESSED:
+	case EVNT_BTN_Setzeinheit_runter_PRESSED:
+	case EVNT_BTN_Setzeinheit_hoch_PRESSED:
+	case EVNT_BTN_Vereinzelung_PRESSED:
+	case EVNT_BTN_hoeher_PRESSED:
+	case EVNT_BTN_tiefer_PRESSED:
+		// regulären Betriebsmodus unterbrechen und in UserInput State wechseln
+		fsmData.fsmState = UserInput;
 		break;
     default:
     	break;
@@ -173,7 +207,7 @@ static void FSM_Task(void *pvParameters) {
 			 * Initialisation Setzeinheit
 			 */
 			LED_Driver_blink_(LED_auto, medium);
-			ION_Motion_Init_Setzeinheit();				// needs to get configured properly (define parameter)
+			ION_Motion_Init_Setzeinheit();					// needs to get configured properly (define parameter)
 			fsmData.positionSetzeinheit = Topf_9;
 			LED_Driver_setVal(LED_auto,OFF);
 			LED_Driver_setVal(LED_9cm,ON);
@@ -184,6 +218,7 @@ static void FSM_Task(void *pvParameters) {
 			LED_Driver_blink_(LED_Spindel_hoch, medium);
 			LED_Driver_blink_(LED_Spindel_runter, medium);
 			// ToDo: Init Spindelantrieb	 		(Endanschlag)
+			//Trinamic_Motion_Init_Stechprozess();			// needs to get configured properly (define parameter)
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 			LED_Driver_setVal(LED_Spindel_hoch,OFF);
 			LED_Driver_setVal(LED_Spindel_runter,OFF);
@@ -193,11 +228,12 @@ static void FSM_Task(void *pvParameters) {
 			break;
 
 		case UserInput:
-			EVNT_HandleEvent(FSM_UserInput_EventHandler, TRUE);			// konfigurieren, manuelle Steuerung
+			EVNT_HandleEvent(FSM_UserInput_EventHandler, TRUE);				// konfigurieren, manuelle Steuerung
 			break;
 
 		case Ready:
-			//EVNT_HandleEvent(FSM_Ready_EventHandler, TRUE);				// Stoppen, neu konfigurieren
+			EVNT_HandleEvent(FSM_Ready_EventHandler, TRUE);					// Stoppen, neu konfigurieren
+			//IR_Sensor_Topferkennung
 			break;
 
 		case Vereinzelung:
