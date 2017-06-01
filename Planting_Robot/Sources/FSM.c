@@ -84,19 +84,34 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		break;
 
 	case EVNT_BTN_Setzeinheit_runter_LPRESSED:
-		Trinamic_Motion_sendPacket(SAP, 0x06, 1000);			//Set the max allowed motor current to 1000mA
-		Trinamic_Motion_sendPacket(ROL, 0x00, 20);
+		Trinamic_Motion_sendPacket(SAP, max_current, 3000);			//Set the max allowed motor current to 3500mA
+		Trinamic_Motion_sendPacket(SAP, start_current, 2500);
+		Trinamic_Motion_sendPacket(SAP, commutation_mode, 8);
+		Trinamic_Motion_sendPacket(ROL, 0x00, 10);
 		break;
 	case EVNT_BTN_Setzeinheit_runter_RELEASED:
 		Trinamic_Motion_sendPacket(MST, 0x00, 0x00);
+		Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
+		//Trinamic_Motion_sendPacket(GAP, acutal_position, 0x00);
+		//Trinamic_Motion_sendPacket(MVP, 0x00, Trinamic_Motion_receivePacket());
 		break;
 
 	case EVNT_BTN_Setzeinheit_hoch_LPRESSED:
-		Trinamic_Motion_sendPacket(SAP, 0x06, 1000);			//Set the max allowed motor current to 1000mA
-		Trinamic_Motion_sendPacket(ROR, 0x00, 20);
+		Trinamic_Motion_sendPacket(SAP, max_current, 3000);			//Set the max allowed motor current to 3500mA
+		Trinamic_Motion_sendPacket(SAP, start_current, 2500);
+		Trinamic_Motion_sendPacket(SAP, commutation_mode, 8);
+		Trinamic_Motion_sendPacket(ROR, 0x00, 10);
 		break;
 	case EVNT_BTN_Setzeinheit_hoch_RELEASED:
+		/*
+		 * Motor stoppen, commutation mode zu Closed Loop umstellen,
+		 * aktuelle Position auslesen, auf aktuelle Position regeln
+		 */
 		Trinamic_Motion_sendPacket(MST, 0x00, 0x00);
+		Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
+		//Trinamic_Motion_sendPacket(GAP, acutal_position, 0x00);
+		//Trinamic_Motion_sendPacket(MVP, 0x00, Trinamic_Motion_receivePacket());
+
 		break;
 
 	case EVNT_BTN_Vereinzelung_PRESSED:
@@ -196,6 +211,7 @@ static void FSM_Task(void *pvParameters) {
 		case Init:
 			ION_Motion_Relais_SetVal();
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+#if 0
 			/*
 			 * Initialisation Vereinzelung
 			 */
@@ -211,6 +227,7 @@ static void FSM_Task(void *pvParameters) {
 			fsmData.positionSetzeinheit = Topf_9;
 			LED_Driver_setVal(LED_auto,OFF);
 			LED_Driver_setVal(LED_9cm,ON);
+#endif
 
 			/*
 			 * Initialisation Spindelantrieb
@@ -218,7 +235,7 @@ static void FSM_Task(void *pvParameters) {
 			LED_Driver_blink_(LED_Spindel_hoch, medium);
 			LED_Driver_blink_(LED_Spindel_runter, medium);
 			// ToDo: Init Spindelantrieb	 		(Endanschlag)
-			//Trinamic_Motion_Init_Stechprozess();			// needs to get configured properly (define parameter)
+			Trinamic_Motion_Init_Stechprozess();			// needs to get configured properly (define parameter)
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 			LED_Driver_setVal(LED_Spindel_hoch,OFF);
 			LED_Driver_setVal(LED_Spindel_runter,OFF);
@@ -234,6 +251,11 @@ static void FSM_Task(void *pvParameters) {
 		case Ready:
 			EVNT_HandleEvent(FSM_Ready_EventHandler, TRUE);					// Stoppen, neu konfigurieren
 			//IR_Sensor_Topferkennung
+			Trinamic_Motion_DriveToZero();
+			FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+			Trinamic_Motion_Stechprozess();
+			FRTOS1_vTaskDelay(3000/portTICK_RATE_MS);
+			fsmData.fsmState = UserInput;
 			break;
 
 		case Vereinzelung:
@@ -251,7 +273,7 @@ static void FSM_Task(void *pvParameters) {
 
 void FSM_Init(void){
 	/* Initialisation of the FSM Task*/
-	if (FRTOS1_xTaskCreate(FSM_Task, (signed portCHAR *)"FSM_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, (xTaskHandle*)NULL) != pdPASS){
+	if (FRTOS1_xTaskCreate(FSM_Task, (signed portCHAR *)"FSM_Task", configMINIMAL_STACK_SIZE, (void*)NULL, 3, (xTaskHandle*)NULL) != pdPASS){
 	   for(;;){}; /* Out of heap memory? */
 	}
 }

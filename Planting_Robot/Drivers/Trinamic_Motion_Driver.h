@@ -47,6 +47,7 @@ typedef enum TRINAMIC_AXIS_PARAMETER_{
 
 	actual_speed			= 3,		// Get actual velocity of the motor.
 	actual_current			= 150,		// Get actual motor current.
+	start_current			= 177,		// Motor current for controlled commutation. This parameter is used in commutation mode.
 
 	p_current				= 172,		// P parameter of current PID regulator.
 	i_current				= 173,		// I parameter of current PID regulator.

@@ -16,7 +16,7 @@
 #define I_VELOCITY_PID		100
 #define P_POSITION_PID		10000
 
-#define CURRENT_LIMIT_INIT_HOCH				1500
+#define CURRENT_LIMIT_INIT_HOCH				1400
 //#define CURRENT_LIMIT_INIT_RUNTER			500
 #define CURRENT_LIMIT_STECHPROZESS_HOCH		2000
 #define CURRENT_LIMIT_STECHPROZESS_RUNTER	1000
@@ -60,6 +60,11 @@ void Trinamic_Motion_Test(){
 	}
 }
 
+void Trinamic_Motion_DriveToZero(){
+	Trinamic_Motion_sendPacket(SAP, max_current, 2000);			//Todo: Configure to reach good performance... must be set higher
+	Trinamic_Motion_sendPacket(MVP, 0x00, 0);
+}
+
 void Trinamic_Motion_Stechprozess(){
 	Trinamic_Motion_sendPacket(SAP, max_current, 2000);			//Todo: Configure to reach good performance... must be set higher
 	Trinamic_Motion_sendPacket(MVP, 0x00, countsSetztiefe);
@@ -101,7 +106,7 @@ void Trinamic_Motion_setSetztiefe(led_t Setztiefe){
 }
 
 void Trinamic_Motion_Init_Stechprozess(){
-	uint32_t motorCurrent = 0;
+	int32_t motorCurrent = 0;
 	/*
 	 * Configure Motor Characteristics
 	 */
@@ -114,28 +119,28 @@ void Trinamic_Motion_Init_Stechprozess(){
 	 */
 	Trinamic_Motion_sendPacket(SAP, p_current, P_TORQUE_PID);
 	Trinamic_Motion_sendPacket(SAP, i_current, I_TORQUE_PID);
-
 	Trinamic_Motion_sendPacket(SAP, p_velocity, P_VELOCITY_PID);
-	Trinamic_Motion_sendPacket(SAP, i_velocity, P_VELOCITY_PID);
-
+	Trinamic_Motion_sendPacket(SAP, i_velocity, I_VELOCITY_PID);
 	Trinamic_Motion_sendPacket(SAP, p_position, P_POSITION_PID);
+	Trinamic_Motion_sendPacket(SAP, acceleration, 200000);
 
 	/*
 	 * Drive to upper mechanical stop and set Hall Counter to 0 - upperOffset
 	 */
 	Trinamic_Motion_sendPacket(SAP, max_current, CURRENT_LIMIT_INIT_HOCH);
-	Trinamic_Motion_sendPacket(ROR, 0x00, 20);
+	Trinamic_Motion_sendPacket(ROL, 0x00, 100);
+	//FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
 
-	while(motorCurrent < (CURRENT_LIMIT_INIT_HOCH-100)){
+	while(abs(motorCurrent) < (CURRENT_LIMIT_INIT_HOCH-100)){			// Bug in Parameter Reading, getting Current Value of 4294967277
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 		AS3_ClearRxBuf();
 		Trinamic_Motion_sendPacket(GAP, actual_current, 0x00);
-		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		//FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 		motorCurrent = Trinamic_Motion_receivePacket();
 		//ToDo: timeout einbauen
 	}
-	Trinamic_Motion_sendPacket(MST, 0x00, 0x00);
-	Trinamic_Motion_sendPacket(SAP, acutal_position, 0x00 - COUNTS_OFFSET_OBEN);
+	//Trinamic_Motion_sendPacket(MST, 0x00, 0x00);
+	Trinamic_Motion_sendPacket(SAP, acutal_position, 0x00 - COUNTS_OFFSET_OBEN);		//0x00 - COUNTS_OFFSET_OBEN
 
 	/*
 	 * Drive to resting position (Counts = 0)
@@ -177,6 +182,7 @@ void Trinamic_Motion_sendPacket(trinamic_command_t instruction, trinamic_axis_pa
 	for(int i=0; i<=8; i++){
 		CLS3_SendChar(command[i]);
 	}
+	FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 }
 
 int32_t Trinamic_Motion_receivePacket(){
