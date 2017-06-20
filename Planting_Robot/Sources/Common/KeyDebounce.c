@@ -102,9 +102,9 @@ static void KEYDBNC_OnDebounceEvent(DBNC_EventKinds event, DBNC_KeySet keys) {
     } if (keys&(1<<8)) {
         EVNT_SetEvent(EVNT_BTN_Vereinzelung_LPRESSED);
     } if (keys&(1<<9)) {
-        EVNT_SetEvent(EVNT_BTN_tiefer_PRESSED);
+        EVNT_SetEvent(EVNT_BTN_tiefer_LPRESSED);
     } if (keys&(1<<10)) {
-        EVNT_SetEvent(EVNT_BTN_hoeher_PRESSED);
+        EVNT_SetEvent(EVNT_BTN_hoeher_LPRESSED);
     }
      break;
 
@@ -129,9 +129,9 @@ static void KEYDBNC_OnDebounceEvent(DBNC_EventKinds event, DBNC_KeySet keys) {
     } if (keys&(1<<8)) {
         EVNT_SetEvent(EVNT_BTN_Vereinzelung_RELEASED);
     } if (keys&(1<<9)) {
-        EVNT_SetEvent(EVNT_BTN_tiefer_PRESSED);
+        EVNT_SetEvent(EVNT_BTN_tiefer_RELEASED);
     } if (keys&(1<<10)) {
-        EVNT_SetEvent(EVNT_BTN_hoeher_PRESSED);
+        EVNT_SetEvent(EVNT_BTN_hoeher_RELEASED);
     }
       break;
     case DBNC_EVENT_END:

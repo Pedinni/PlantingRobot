@@ -14,20 +14,22 @@
 #define I_TORQUE_PID		260
 #define P_VELOCITY_PID		2000
 #define I_VELOCITY_PID		100
-#define P_POSITION_PID		10000
+#define P_POSITION_PID		20000
 
-#define CURRENT_LIMIT_INIT_HOCH				1400
+#define VELOCITY_RAMP_ACCEL	35000
+
+#define CURRENT_LIMIT_INIT_HOCH				2000
 //#define CURRENT_LIMIT_INIT_RUNTER			500
-#define CURRENT_LIMIT_STECHPROZESS_HOCH		2000
-#define CURRENT_LIMIT_STECHPROZESS_RUNTER	1000
+#define CURRENT_LIMIT_STECHPROZESS_HOCH		10000
+#define CURRENT_LIMIT_STECHPROZESS_RUNTER	10000
 
-#define COUNTS_OFFSET_OBEN			4
-#define COUNTS_POSITION_STANDARD	36			// Schätzwert (3 Umdrehungen)		Todo: Messen
+#define COUNTS_OFFSET_OBEN			6			// 4
+#define COUNTS_POSITION_STANDARD	50			// Schätzwert (3 Umdrehungen)		Todo: Messen
 #define COUNTS_POSITION_UNTEN		48			// Schätzwert (4 Umdrehungen)		Todo: Messen
 #define COUTNS_SETZTIEFE_VERSTELLEN	5			// Schätzwert
 #define COUNTS_OFFSET_UNTEN			4
 
-#define TIME_TO_GO_UP_AGAIN		500				// Must be set to ca. 200ms to reach the specifications in the Pflichtenheft (ms)
+#define TIME_TO_GO_UP_AGAIN		150				// Must be set to ca. 200ms to reach the specifications in the Pflichtenheft (ms)
 
 static int countsSetztiefe = COUNTS_POSITION_STANDARD;		// 12 Hall counts = 1 Revolutions
 
@@ -66,10 +68,11 @@ void Trinamic_Motion_DriveToZero(){
 }
 
 void Trinamic_Motion_Stechprozess(){
-	Trinamic_Motion_sendPacket(SAP, max_current, 2000);			//Todo: Configure to reach good performance... must be set higher
+	Trinamic_Motion_sendPacket(SAP, max_current, CURRENT_LIMIT_STECHPROZESS_HOCH);			//Todo: Configure to reach good performance... must be set higher
 	Trinamic_Motion_sendPacket(MVP, 0x00, countsSetztiefe);
 	FRTOS1_vTaskDelay(TIME_TO_GO_UP_AGAIN/portTICK_RATE_MS);
 	Trinamic_Motion_sendPacket(MVP, 0x00, 0);
+	//Trinamic_Motion_sendPacket(SAP, max_current, CURRENT_LIMIT_INIT_HOCH);
 }
 
 /*
@@ -122,16 +125,16 @@ void Trinamic_Motion_Init_Stechprozess(){
 	Trinamic_Motion_sendPacket(SAP, p_velocity, P_VELOCITY_PID);
 	Trinamic_Motion_sendPacket(SAP, i_velocity, I_VELOCITY_PID);
 	Trinamic_Motion_sendPacket(SAP, p_position, P_POSITION_PID);
-	Trinamic_Motion_sendPacket(SAP, acceleration, 200000);
+	Trinamic_Motion_sendPacket(SAP, acceleration, VELOCITY_RAMP_ACCEL);
 
 	/*
 	 * Drive to upper mechanical stop and set Hall Counter to 0 - upperOffset
 	 */
 	Trinamic_Motion_sendPacket(SAP, max_current, CURRENT_LIMIT_INIT_HOCH);
-	Trinamic_Motion_sendPacket(ROL, 0x00, 100);
+	Trinamic_Motion_sendPacket(ROL, 0x00, 200);
 	//FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
 
-	while(abs(motorCurrent) < (CURRENT_LIMIT_INIT_HOCH-100)){			// Bug in Parameter Reading, getting Current Value of 4294967277
+	while(abs(motorCurrent) < (CURRENT_LIMIT_INIT_HOCH-100)){
 		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 		AS3_ClearRxBuf();
 		Trinamic_Motion_sendPacket(GAP, actual_current, 0x00);

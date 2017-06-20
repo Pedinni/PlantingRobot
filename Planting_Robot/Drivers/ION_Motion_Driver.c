@@ -167,8 +167,9 @@ void ION_Motion_setPosition(ion_command_t command, position_t pos){
  * then clear the encoder counts and drive till the hole mask matches.
  */
 void ION_Motion_Init_Vereinzelung(){
-	setMotorSpeed(drive_vereinzelung_backward,100);
+	setMotorSpeed(drive_vereinzelung_backward,200);
 	while(Hall_Sensor_GetVal()){
+		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 		//ToDo: timeout einbauen
 	}
 	setEncoderValue(set_encoder_vereinzelung,0);
@@ -211,7 +212,7 @@ void ION_Motion_Init_Setzeinheit(){
 	}
 	setMotorSpeed(drive_setzeinheit_backward,0);
 	setEncoderValue(set_encoder_setzeinheit,0);
-	ION_Motion_setPosition(set_position_setzeinheit, position_Topf_9);
+	ION_Motion_setPosition(set_position_setzeinheit, Topf_12);
 }
 
 /*
