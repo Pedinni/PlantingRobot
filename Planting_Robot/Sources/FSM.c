@@ -26,7 +26,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_9cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_9cm_PRESSED:
-		ION_Motion_setPosition(set_position_setzeinheit, Topf_9);
+		//ION_Motion_setPosition(set_position_setzeinheit, Topf_9);
 		fsmData.positionSetzeinheit = Topf_9;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_9cm,5,fast);
@@ -36,7 +36,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_11cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_11cm_PRESSED:
-		ION_Motion_setPosition(set_position_setzeinheit, Topf_11);
+		//ION_Motion_setPosition(set_position_setzeinheit, Topf_11);
 		fsmData.positionSetzeinheit = Topf_11;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_11cm,5,fast);
@@ -46,7 +46,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_12cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_12cm_PRESSED:
-		ION_Motion_setPosition(set_position_setzeinheit, Topf_12);
+		//ION_Motion_setPosition(set_position_setzeinheit, Topf_12);
 		fsmData.positionSetzeinheit = Topf_12;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_12cm,5,fast);
@@ -56,7 +56,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_13cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_13cm_PRESSED:
-		ION_Motion_setPosition(set_position_setzeinheit, Topf_13);
+		//ION_Motion_setPosition(set_position_setzeinheit, Topf_13);
 		fsmData.positionSetzeinheit = Topf_13;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_13cm,5,fast);
@@ -66,7 +66,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_14cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_14cm_PRESSED:
-		ION_Motion_setPosition(set_position_setzeinheit, Topf_14);
+		//ION_Motion_setPosition(set_position_setzeinheit, Topf_14);
 		fsmData.positionSetzeinheit = Topf_14;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_14cm,5,fast);
@@ -83,23 +83,25 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		//LED_Driver_setVal(LED_AUTO,ON);						//Auto Push button nicht leuchten lassen, da Auto Topfgrössenerkennung nicht implementiert
 		break;
 
+	case EVNT_BTN_Setzeinheit_runter_PRESSED:
 	case EVNT_BTN_Setzeinheit_runter_LPRESSED:
-		Trinamic_Motion_sendPacket(SAP, max_current, 2000);			//Set the max allowed motor current to 3500mA
-		Trinamic_Motion_sendPacket(SAP, start_current, 2500);
-		Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
+		Trinamic_Motion_sendPacket(SAP, max_current, 2000);			//Set the max allowed motor current to 2000mA
+		//Trinamic_Motion_sendPacket(SAP, start_current, 2500);
+		//Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
 		Trinamic_Motion_sendPacket(ROL, 0x00, 200);
 		break;
 	case EVNT_BTN_Setzeinheit_runter_RELEASED:
-		Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
+		//Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
 		Trinamic_Motion_sendPacket(MST, 0x00, 0x00);
 		//Trinamic_Motion_sendPacket(GAP, acutal_position, 0x00);
 		//Trinamic_Motion_sendPacket(MVP, 0x00, Trinamic_Motion_receivePacket());
 		break;
 
+	case EVNT_BTN_Setzeinheit_hoch_PRESSED:
 	case EVNT_BTN_Setzeinheit_hoch_LPRESSED:
-		Trinamic_Motion_sendPacket(SAP, max_current, 2000);			//Set the max allowed motor current to 3500mA
-		Trinamic_Motion_sendPacket(SAP, start_current, 2500);
-		Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
+		Trinamic_Motion_sendPacket(SAP, max_current, 2000);			//Set the max allowed motor current to 2000mA
+		//Trinamic_Motion_sendPacket(SAP, start_current, 2500);
+		//Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
 		Trinamic_Motion_sendPacket(ROR, 0x00, 200);
 		break;
 	case EVNT_BTN_Setzeinheit_hoch_RELEASED:
@@ -107,11 +109,10 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		 * Motor stoppen, commutation mode zu Closed Loop umstellen,
 		 * aktuelle Position auslesen, auf aktuelle Position regeln
 		 */
-		Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
+		//Trinamic_Motion_sendPacket(SAP, commutation_mode, 6);
 		Trinamic_Motion_sendPacket(MST, 0x00, 0x00);
 		//Trinamic_Motion_sendPacket(GAP, acutal_position, 0x00);
 		//Trinamic_Motion_sendPacket(MVP, 0x00, Trinamic_Motion_receivePacket());
-
 		break;
 
 	case EVNT_BTN_Vereinzelung_PRESSED:
@@ -191,6 +192,38 @@ void FSM_Ready_EventHandler(EVNT_Handle event) {
 		// regulären Betriebsmodus unterbrechen und in UserInput State wechseln
 		fsmData.fsmState = UserInput;
 		break;
+
+	case EVNT_BTN_TC5_PRESSED:
+		fsmData.fsmState = Single;
+		break;
+
+	case EVNT_BTN_TC5_LPRESSED:
+		fsmData.fsmState = Demo;
+		break;
+
+    default:
+    	break;
+   } /* switch */
+}
+
+void FSM_Demo_EventHandler(EVNT_Handle event) {
+	switch(event) {
+	case EVNT_BTN_9cm_PRESSED:				// Any Button Press
+	case EVNT_BTN_11cm_PRESSED:
+	case EVNT_BTN_12cm_PRESSED:
+	case EVNT_BTN_13cm_PRESSED:
+	case EVNT_BTN_14cm_PRESSED:
+	case EVNT_BTN_AUTO_PRESSED:
+	case EVNT_BTN_Setzeinheit_runter_PRESSED:
+	case EVNT_BTN_Setzeinheit_hoch_PRESSED:
+	case EVNT_BTN_Vereinzelung_PRESSED:
+	case EVNT_BTN_hoeher_PRESSED:
+	case EVNT_BTN_tiefer_PRESSED:
+	case EVNT_BTN_TC5_PRESSED:
+		// Demo Betriebsmodus unterbrechen und in Ready State wechseln
+		fsmData.fsmState = Ready;
+		break;
+
     default:
     	break;
    } /* switch */
@@ -211,7 +244,7 @@ static void FSM_Task(void *pvParameters) {
 		case Init:
 			ION_Motion_Relais_SetVal();
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-#if 1
+#if 0
 			/*
 			 * Initialisation Vereinzelung
 			 */
@@ -251,20 +284,36 @@ static void FSM_Task(void *pvParameters) {
 			break;
 
 		case Ready:
+			EVNT_HandleEvent(FSM_Ready_EventHandler, TRUE);
+
 			//IR_Sensor_Topferkennung
 			//Trinamic_Motion_DriveToZero();
-			FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
-			EVNT_HandleEvent(FSM_Ready_EventHandler, TRUE);					// Stoppen, neu konfigurieren
+			//FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
+			//EVNT_HandleEvent(FSM_Ready_EventHandler, TRUE);					// Stoppen, neu konfigurieren
 
+			/*
 			ION_Motion_step_Vereinzelung();
 
 			Trinamic_Motion_Stechprozess();
 
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+			*/
+			//fsmData.fsmState = UserInput;
+			break;
 
+		case Demo:
+			ION_Motion_step_Vereinzelung();
+			Trinamic_Motion_Stechprozess();
 
+			EVNT_HandleEvent(FSM_Demo_EventHandler, TRUE);
+			FRTOS1_vTaskDelay(500/portTICK_RATE_MS);
+			EVNT_HandleEvent(FSM_Demo_EventHandler, TRUE);
+			break;
 
-			fsmData.fsmState = UserInput;
+		case Single:
+			ION_Motion_step_Vereinzelung();
+			Trinamic_Motion_Stechprozess();
+			fsmData.fsmState = Ready;
 			break;
 
 		case Vereinzelung:

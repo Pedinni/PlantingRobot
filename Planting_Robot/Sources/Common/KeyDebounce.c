@@ -31,7 +31,9 @@ static DBNC_KeySet KEYDBNC_GetKeys(void) {
 			  ((int)!BTN_Vereinzeln_GetVal() 		 << 8) +
 
 			  ((int)!BTN_tiefer_GetVal() << 9) +
-			  ((int)!BTN_hoeher_GetVal() << 10);
+			  ((int)!BTN_hoeher_GetVal() << 10) +
+
+			  ((int)!BTN_TC5_GetVal() << 11);
   return keys;
 }
 
@@ -69,15 +71,17 @@ static void KEYDBNC_OnDebounceEvent(DBNC_EventKinds event, DBNC_KeySet keys) {
       } if (keys&(1<<5)) {
         EVNT_SetEvent(EVNT_BTN_AUTO_PRESSED);
       } if (keys&(1<<6)) {
-        EVNT_SetEvent(EVNT_BTN_Setzeinheit_hoch_PRESSED);
+        EVNT_SetEvent(EVNT_BTN_Setzeinheit_runter_PRESSED);
       } if (keys&(1<<7)) {
-          EVNT_SetEvent(EVNT_BTN_Setzeinheit_runter_PRESSED);
+          EVNT_SetEvent(EVNT_BTN_Setzeinheit_hoch_PRESSED);
       } if (keys&(1<<8)) {
           EVNT_SetEvent(EVNT_BTN_Vereinzelung_PRESSED);
       } if (keys&(1<<9)) {
           EVNT_SetEvent(EVNT_BTN_tiefer_PRESSED);
       } if (keys&(1<<10)) {
           EVNT_SetEvent(EVNT_BTN_hoeher_PRESSED);
+      } if (keys&(1<<11)) {
+          EVNT_SetEvent(EVNT_BTN_TC5_PRESSED);
       }
       break;
 
@@ -105,6 +109,8 @@ static void KEYDBNC_OnDebounceEvent(DBNC_EventKinds event, DBNC_KeySet keys) {
         EVNT_SetEvent(EVNT_BTN_tiefer_LPRESSED);
     } if (keys&(1<<10)) {
         EVNT_SetEvent(EVNT_BTN_hoeher_LPRESSED);
+    } if (keys&(1<<11)) {
+        EVNT_SetEvent(EVNT_BTN_TC5_LPRESSED);
     }
      break;
 
@@ -132,6 +138,8 @@ static void KEYDBNC_OnDebounceEvent(DBNC_EventKinds event, DBNC_KeySet keys) {
         EVNT_SetEvent(EVNT_BTN_tiefer_RELEASED);
     } if (keys&(1<<10)) {
         EVNT_SetEvent(EVNT_BTN_hoeher_RELEASED);
+    } if (keys&(1<<11)) {
+        EVNT_SetEvent(EVNT_BTN_TC5_RELEASED);
     }
       break;
     case DBNC_EVENT_END:

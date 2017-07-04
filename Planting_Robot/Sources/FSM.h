@@ -24,6 +24,8 @@ typedef enum FSM_STATE_{
 	Init,
 	UserInput,
 	Ready,
+	Demo,
+	Single,
 	Stechprozess,
 	Vereinzelung
 } fsm_state_t;

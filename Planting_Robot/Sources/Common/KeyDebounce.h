@@ -22,6 +22,7 @@
 #include "BTN_Vereinzeln.h"
 #include "BTN_hoeher.h"
 #include "BTN_tiefer.h"
+#include "BTN_TC5.h"
 
 /*!
  * \brief Kicks the debouncing state machine.

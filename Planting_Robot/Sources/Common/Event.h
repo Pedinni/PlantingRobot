@@ -60,6 +60,10 @@ typedef enum EVNT_Handle {
 	EVNT_BTN_hoeher_RELEASED,
     EVNT_BTN_hoeher_LPRESSED,
 
+	EVNT_BTN_TC5_PRESSED,
+	EVNT_BTN_TC5_RELEASED,
+	EVNT_BTN_TC5_LPRESSED,
+
 	EVNT_NOF_EVENTS       /*!< Must be last one! */
 } EVNT_Handle;
 
