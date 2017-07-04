@@ -219,8 +219,10 @@ static void FSM_Task(void *pvParameters) {
 			ION_Motion_Init_Vereinzelung();					// needs to get configured properly (define parameter)
 			LED_Driver_setVal(LED_Vereinzelung,OFF);
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+#endif
+#if 0
 			/*
-			 * Initialisation Setzeinheit
+			 * Initialisation Vestellmechanik
 			 */
 			LED_Driver_blink_(LED_auto, medium);
 			ION_Motion_Init_Setzeinheit();					// needs to get configured properly (define parameter)
