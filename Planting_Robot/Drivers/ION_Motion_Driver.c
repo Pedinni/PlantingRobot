@@ -18,8 +18,8 @@
 #define InitSetzeinheitSpeed	60			// Geschwindigkeit mit welcher der Motor für die Setzeinheit auf den Anschlag zufährt
 #define InitSetzeinheitCurrent	15			// Schwellwert ab welchem der Motor als blockiert eingestuft wird (Einheit auf Anschlag) 10 = 0.1A
 
-#define CountsVereinzelung	-3025
-#define OffsetVereinzelung	-1700
+#define CountsVereinzelung	22600		//-3025
+#define OffsetVereinzelung	12900		//-1700
 #define STEPVEREINZELUNGTIMOUT 50
 
 
@@ -167,9 +167,9 @@ void ION_Motion_setPosition(ion_command_t command, position_t pos){
  * then clear the encoder counts and drive till the hole mask matches.
  */
 void ION_Motion_Init_Vereinzelung(){
-	setMotorSpeed(drive_vereinzelung_backward,200);
+	setMotorSpeed(drive_vereinzelung_forward,200);
 	while(Hall_Sensor_GetVal()){
-		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		FRTOS1_vTaskDelay(1/portTICK_RATE_MS);					//10ms
 		//ToDo: timeout einbauen
 	}
 	setEncoderValue(set_encoder_vereinzelung,0);
@@ -186,7 +186,7 @@ void ION_Motion_step_Vereinzelung(){
 	ION_Motion_setPosition(set_position_vereinzelung, Counts_Vereinzelung);
 	while(hall && timer <= STEPVEREINZELUNGTIMOUT){
 		hall = Hall_Sensor_GetVal();
-		FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
+		FRTOS1_vTaskDelay(1/portTICK_RATE_MS);					//10ms
 		timer++;
 	}
 	if(!hall){

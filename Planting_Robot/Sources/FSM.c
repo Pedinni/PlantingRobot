@@ -244,7 +244,7 @@ static void FSM_Task(void *pvParameters) {
 		case Init:
 			ION_Motion_Relais_SetVal();
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-#if 0
+#if 1
 			/*
 			 * Initialisation Vereinzelung
 			 */
