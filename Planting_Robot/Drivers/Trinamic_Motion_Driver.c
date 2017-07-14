@@ -24,10 +24,12 @@
 #define CURRENT_LIMIT_STECHPROZESS_RUNTER	10000
 
 #define COUNTS_OFFSET_OBEN			6			// 4
-#define COUNTS_POSITION_STANDARD	50			// Schätzwert (3 Umdrehungen)		Todo: Messen
-#define COUNTS_POSITION_UNTEN		48			// Schätzwert (4 Umdrehungen)		Todo: Messen
-#define COUTNS_SETZTIEFE_VERSTELLEN	5			// Schätzwert
+#define COUNTS_POSITION_STANDARD	44			// Schätzwert (3 Umdrehungen)		Todo: Messen
+#define COUNTS_POSITION_UNTEN		50			// Schätzwert (4 Umdrehungen)		Todo: Messen
+#define COUTNS_SETZTIEFE_VERSTELLEN	3			// Schätzwert
 #define COUNTS_OFFSET_UNTEN			4
+
+#define DELAY_STECHPROZESS			1000			// Schätzwert
 
 #define TIME_TO_GO_UP_AGAIN		150				// Must be set to ca. 200ms to reach the specifications in the Pflichtenheft (ms)
 
@@ -63,16 +65,16 @@ void Trinamic_Motion_Test(){
 }
 
 void Trinamic_Motion_DriveToZero(){
-	Trinamic_Motion_sendPacket(SAP, max_current, 2000);			//Todo: Configure to reach good performance... must be set higher
+	Trinamic_Motion_sendPacket(SAP, max_current, 2000);
 	Trinamic_Motion_sendPacket(MVP, 0x00, 0);
 }
 
 void Trinamic_Motion_Stechprozess(){
-	Trinamic_Motion_sendPacket(SAP, max_current, CURRENT_LIMIT_STECHPROZESS_HOCH);			//Todo: Configure to reach good performance... must be set higher
+	FRTOS1_vTaskDelay(DELAY_STECHPROZESS/portTICK_RATE_MS);
+	Trinamic_Motion_sendPacket(SAP, max_current, CURRENT_LIMIT_STECHPROZESS_HOCH);
 	Trinamic_Motion_sendPacket(MVP, 0x00, countsSetztiefe);
 	FRTOS1_vTaskDelay(TIME_TO_GO_UP_AGAIN/portTICK_RATE_MS);
 	Trinamic_Motion_sendPacket(MVP, 0x00, 0);
-	//Trinamic_Motion_sendPacket(SAP, max_current, CURRENT_LIMIT_INIT_HOCH);
 }
 
 /*
@@ -83,6 +85,9 @@ void Trinamic_Motion_setSetztiefe(led_t Setztiefe){
 	int setztiefeOffset = 0;
 
 	switch(Setztiefe){
+		case LED_Setztiefe_normal:
+			setztiefeOffset = 0;
+			break;
 		case LED_Setztiefe_minus_1:
 			setztiefeOffset = COUTNS_SETZTIEFE_VERSTELLEN;
 			break;
@@ -99,8 +104,8 @@ void Trinamic_Motion_setSetztiefe(led_t Setztiefe){
 			break;
 	}
 
-	if((COUNTS_POSITION_STANDARD + setztiefeOffset) > (COUNTS_POSITION_UNTEN-COUNTS_OFFSET_UNTEN)){
-		countsSetztiefe = COUNTS_POSITION_UNTEN - COUNTS_OFFSET_UNTEN;
+	if((COUNTS_POSITION_STANDARD + setztiefeOffset) > (COUNTS_POSITION_UNTEN)){
+		countsSetztiefe = COUNTS_POSITION_UNTEN;
 	} else if((COUNTS_POSITION_STANDARD + setztiefeOffset) < 0){
 		countsSetztiefe = 0;
 	} else{

@@ -14,6 +14,7 @@
 #include "LED1.h"
 #include "ION_Motion_Relais.h"
 #include "Hall_Sensor.h"
+#include "Vibra_Motor.h"
 
 typedef enum ION_COMMAND_{
 	drive_setzeinheit_backward 		= 5,

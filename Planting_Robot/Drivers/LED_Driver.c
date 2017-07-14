@@ -32,6 +32,7 @@
 static TaskHandle_t LED_Pulse_Task_Handle = NULL;
 
 static bool pulsing = FALSE;
+static bool pulsingUser = FALSE;
 
 static void LED_Task(void *pvParameters) {
   (void)pvParameters; /* parameter not used */
@@ -60,12 +61,12 @@ static void LED_Pulse_Task(void *pvParameters) {
 	  }
 	  */
 	  for(;;) {
-		  for(int i = 0; i<255; i++){
+		  for(int i = 0; i<200; i++){
 			  uint8_t writeData[2] = {0x03,(uint8_t)i};
 			  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
 			  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
 		  }
-		  for(int i = 255; i>0; i--){
+		  for(int i = 200; i>0; i--){
 			  uint8_t writeData[2] = {0x03,(uint8_t)i};
 			  GI2C1_WriteBlock(writeData,sizeof(writeData),GI2C1_SEND_STOP);
 		  	  FRTOS1_vTaskDelay(10/portTICK_RATE_MS);
@@ -102,6 +103,31 @@ void LED_Driver_pulseAll(bool activ){
 		LED_Driver_setVal(LED_Setztiefe_plus_1 ,DIM0);
 		LED_Driver_setVal(LED_Setztiefe_plus_2 ,DIM0);
 		pulsing = TRUE;
+	}
+}
+
+void LED_Driver_pulseUser(bool activ){
+	if(activ && LED_Pulse_Task_Handle == NULL){
+		if (FRTOS1_xTaskCreate(LED_Pulse_Task, (signed portCHAR *)"LED_Pulse_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, &LED_Pulse_Task_Handle) != pdPASS){
+			for(;;){}; /* Out of heap memory? */
+		}
+	} else if (activ && LED_Pulse_Task_Handle != NULL) {
+		vTaskResume(LED_Pulse_Task_Handle);
+	} else{
+		if(LED_Pulse_Task_Handle){
+			vTaskSuspend(LED_Pulse_Task_Handle);
+			LED_Driver_setVal(LED_Spindel_hoch ,OFF);
+			LED_Driver_setVal(LED_Spindel_runter ,OFF);
+			LED_Driver_setVal(LED_Vereinzelung ,OFF);
+		}
+		pulsingUser = FALSE;
+		return;
+	}
+	if(!pulsingUser){
+		LED_Driver_setVal(LED_Spindel_hoch ,DIM0);
+		LED_Driver_setVal(LED_Spindel_runter ,DIM0);
+		LED_Driver_setVal(LED_Vereinzelung ,DIM0);
+		pulsingUser = TRUE;
 	}
 
 }

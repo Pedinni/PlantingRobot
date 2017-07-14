@@ -26,7 +26,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_9cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_9cm_PRESSED:
-		//ION_Motion_setPosition(set_position_setzeinheit, Topf_9);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_9);
 		fsmData.positionSetzeinheit = Topf_9;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_9cm,5,fast);
@@ -36,7 +36,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_11cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_11cm_PRESSED:
-		//ION_Motion_setPosition(set_position_setzeinheit, Topf_11);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_11);
 		fsmData.positionSetzeinheit = Topf_11;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_11cm,5,fast);
@@ -46,7 +46,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_12cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_12cm_PRESSED:
-		//ION_Motion_setPosition(set_position_setzeinheit, Topf_12);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_12);
 		fsmData.positionSetzeinheit = Topf_12;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_12cm,5,fast);
@@ -56,7 +56,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_13cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_13cm_PRESSED:
-		//ION_Motion_setPosition(set_position_setzeinheit, Topf_13);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_13);
 		fsmData.positionSetzeinheit = Topf_13;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_13cm,5,fast);
@@ -66,7 +66,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 	case EVNT_BTN_14cm_LPRESSED:
 		fsmData.fsmState = Ready;
 	case EVNT_BTN_14cm_PRESSED:
-		//ION_Motion_setPosition(set_position_setzeinheit, Topf_14);
+		ION_Motion_setPosition(set_position_setzeinheit, Topf_14);
 		fsmData.positionSetzeinheit = Topf_14;
 		LED_Driver_clear_Topfgroesse();
 		LED_Driver_blink(LED_14cm,5,fast);
@@ -119,6 +119,7 @@ void FSM_UserInput_EventHandler(EVNT_Handle event) {
 		LED_Driver_blink_(LED_Vereinzelung,medium);
 		ION_Motion_step_Vereinzelung();
 		LED_Driver_setVal(LED_Vereinzelung,OFF);
+		LED_Driver_setVal(LED_Vereinzelung,DIM0);
 		break;
 
 	case EVNT_BTN_hoeher_PRESSED:
@@ -243,25 +244,25 @@ static void FSM_Task(void *pvParameters) {
 
 		case Init:
 			ION_Motion_Relais_SetVal();
-			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
+			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);		// Strat up Motion controller
 #if 1
 			/*
 			 * Initialisation Vereinzelung
 			 */
 			LED_Driver_blink_(LED_Vereinzelung, medium);
-			ION_Motion_Init_Vereinzelung();					// needs to get configured properly (define parameter)
+			ION_Motion_Init_Vereinzelung();
 			LED_Driver_setVal(LED_Vereinzelung,OFF);
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 #endif
-#if 0
+#if 1
 			/*
 			 * Initialisation Vestellmechanik
 			 */
 			LED_Driver_blink_(LED_auto, medium);
 			ION_Motion_Init_Setzeinheit();					// needs to get configured properly (define parameter)
-			fsmData.positionSetzeinheit = Topf_12;
+			fsmData.positionSetzeinheit = Topf_9;
 			LED_Driver_setVal(LED_auto,OFF);
-			LED_Driver_setVal(LED_12cm,ON);
+			LED_Driver_setVal(LED_9cm,ON);
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 #endif
 #if 1
@@ -270,7 +271,7 @@ static void FSM_Task(void *pvParameters) {
 			 */
 			LED_Driver_blink_(LED_Spindel_hoch, medium);
 			LED_Driver_blink_(LED_Spindel_runter, medium);
-			Trinamic_Motion_Init_Stechprozess();			// needs to get configured properly (define parameter)
+			Trinamic_Motion_Init_Stechprozess();
 			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
 			LED_Driver_setVal(LED_Spindel_hoch,OFF);
 			LED_Driver_setVal(LED_Spindel_runter,OFF);
@@ -280,33 +281,23 @@ static void FSM_Task(void *pvParameters) {
 			break;
 
 		case UserInput:
+			LED_Driver_pulseUser(TRUE);
 			EVNT_HandleEvent(FSM_UserInput_EventHandler, TRUE);				// konfigurieren, manuelle Steuerung
 			break;
 
 		case Ready:
+			LED_Driver_pulseUser(FALSE);
 			EVNT_HandleEvent(FSM_Ready_EventHandler, TRUE);
 
-			//IR_Sensor_Topferkennung
-			//Trinamic_Motion_DriveToZero();
-			//FRTOS1_vTaskDelay(1000/portTICK_RATE_MS);
-			//EVNT_HandleEvent(FSM_Ready_EventHandler, TRUE);					// Stoppen, neu konfigurieren
-
-			/*
-			ION_Motion_step_Vereinzelung();
-
-			Trinamic_Motion_Stechprozess();
-
-			FRTOS1_vTaskDelay(2000/portTICK_RATE_MS);
-			*/
-			//fsmData.fsmState = UserInput;
 			break;
 
 		case Demo:
 			ION_Motion_step_Vereinzelung();
+			EVNT_HandleEvent(FSM_Demo_EventHandler, TRUE);
 			Trinamic_Motion_Stechprozess();
 
-			EVNT_HandleEvent(FSM_Demo_EventHandler, TRUE);
-			FRTOS1_vTaskDelay(500/portTICK_RATE_MS);
+			//EVNT_HandleEvent(FSM_Demo_EventHandler, TRUE);
+			//FRTOS1_vTaskDelay(500/portTICK_RATE_MS);
 			EVNT_HandleEvent(FSM_Demo_EventHandler, TRUE);
 			break;
 

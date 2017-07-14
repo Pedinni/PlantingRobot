@@ -9,20 +9,22 @@
 
 #define address	0x80
 
-#define position_Topf_9 	0
-#define position_Topf_11 	300
-#define position_Topf_12 	600
-#define position_Topf_13 	900
-#define position_Topf_14 	1200
+#define position_Topf_9 	600				// 0
+#define position_Topf_11 	400				// 300
+#define position_Topf_12 	800				// 600
+#define position_Topf_13 	200				// 900
+#define position_Topf_14 	1000			// 1200
 
 #define InitSetzeinheitSpeed	60			// Geschwindigkeit mit welcher der Motor für die Setzeinheit auf den Anschlag zufährt
 #define InitSetzeinheitCurrent	15			// Schwellwert ab welchem der Motor als blockiert eingestuft wird (Einheit auf Anschlag) 10 = 0.1A
 
-#define CountsVereinzelung	22600		//-3025
-#define OffsetVereinzelung	12900		//-1700
-#define STEPVEREINZELUNGTIMOUT 50
+#define CountsVereinzelung		22600		// -3025
+#define OffsetVereinzelung		12800		// 12900	//-1700
+#define STEPVEREINZELUNGTIMOUT 	500
 
+#define DELAY_VEREINZELUNG		0
 
+static TaskHandle_t Vereinzelung_Task_Handle = NULL;
 
 ion_motion_data_t IONdata ={
 		0,
@@ -169,7 +171,7 @@ void ION_Motion_setPosition(ion_command_t command, position_t pos){
 void ION_Motion_Init_Vereinzelung(){
 	setMotorSpeed(drive_vereinzelung_forward,200);
 	while(Hall_Sensor_GetVal()){
-		FRTOS1_vTaskDelay(1/portTICK_RATE_MS);					//10ms
+		FRTOS1_vTaskDelay(1/portTICK_RATE_MS);					//10
 		//ToDo: timeout einbauen
 	}
 	setEncoderValue(set_encoder_vereinzelung,0);
@@ -180,22 +182,54 @@ void ION_Motion_Init_Vereinzelung(){
 	ION_Motion_setPosition(set_position_vereinzelung, Offset_Vereinzelung);
 }
 
-void ION_Motion_step_Vereinzelung(){
-	bool hall = TRUE;
-	int timer = 0;
-	ION_Motion_setPosition(set_position_vereinzelung, Counts_Vereinzelung);
-	while(hall && timer <= STEPVEREINZELUNGTIMOUT){
-		hall = Hall_Sensor_GetVal();
-		FRTOS1_vTaskDelay(1/portTICK_RATE_MS);					//10ms
-		timer++;
+/*
+ * Implements a Task for a step of the Vereinzelung. It's implemented in a Task, so
+ * that the Vereinzelung and the Setzprozess can run concurrently.
+ */
+
+static void Vereinzelung_Task(void *pvParameters) {
+	(void)pvParameters; /* parameter not used */
+
+	for(;;){
+		Vibra_Motor_SetVal();
+		bool hall = TRUE;
+		int timer = 0;
+		EnterCritical();
+		ION_Motion_setPosition(set_position_vereinzelung, Counts_Vereinzelung);
+		ExitCritical();
+		while(hall && timer <= STEPVEREINZELUNGTIMOUT){
+			hall = Hall_Sensor_GetVal();
+			FRTOS1_vTaskDelay(1/portTICK_RATE_MS);					//10
+			timer++;
+		}
+		if(!hall){												// Magnet recognized --> Reset encoder counts
+			EnterCritical();
+			setEncoderValue(set_encoder_vereinzelung,0);
+			IONdata.EncoderVereinzelung = 0;
+			ExitCritical();
+			//FRTOS1_vTaskDelay(1/portTICK_RATE_MS);			//todo: unnötig?
+			//setMotorSpeed(drive_vereinzelung_backward,0);		// ^^		^^
+			FRTOS1_vTaskDelay(1/portTICK_RATE_MS);
+			EnterCritical();
+			ION_Motion_setPosition(set_position_vereinzelung, Offset_Vereinzelung);
+			ExitCritical();
+			FRTOS1_vTaskDelay(400/portTICK_RATE_MS);
+		}
+		Vibra_Motor_ClrVal();
+		vTaskSuspend( NULL );		//suspend myselfe
 	}
-	if(!hall){
-		setEncoderValue(set_encoder_vereinzelung,0);
-		IONdata.EncoderVereinzelung = 0;
-		FRTOS1_vTaskDelay(1/portTICK_RATE_MS);
-		setMotorSpeed(drive_vereinzelung_backward,0);
-		FRTOS1_vTaskDelay(1/portTICK_RATE_MS);
-		ION_Motion_setPosition(set_position_vereinzelung, Offset_Vereinzelung);
+}
+
+void ION_Motion_step_Vereinzelung(){
+	FRTOS1_vTaskDelay(DELAY_VEREINZELUNG/portTICK_RATE_MS);
+	if(Vereinzelung_Task_Handle == NULL){
+		if (FRTOS1_xTaskCreate(Vereinzelung_Task, (signed portCHAR *)"Vereinzelung_Task", configMINIMAL_STACK_SIZE, (void*)NULL, tskIDLE_PRIORITY, &Vereinzelung_Task_Handle) != pdPASS){
+			for(;;){}; /* Out of heap memory? */
+		}
+	} else if (Vereinzelung_Task_Handle != NULL) {
+		vTaskResume(Vereinzelung_Task_Handle);
+	} else {
+		for(;;){}; /* Error - No Task created? */
 	}
 }
 
@@ -212,7 +246,7 @@ void ION_Motion_Init_Setzeinheit(){
 	}
 	setMotorSpeed(drive_setzeinheit_backward,0);
 	setEncoderValue(set_encoder_setzeinheit,0);
-	ION_Motion_setPosition(set_position_setzeinheit, Topf_12);
+	ION_Motion_setPosition(set_position_setzeinheit, Topf_9);
 }
 
 /*
